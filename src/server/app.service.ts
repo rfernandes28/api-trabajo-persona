@@ -13,8 +13,8 @@ import { CreatePackageDto } from '../app/packages/dto/create-package.dto';
 import { CreatePresentationDto } from '../app/presentations/dto/create-presentation.dto';
 import { MedicinesService } from '../app/medicines/medicines.service';
 import { CreateMedicineDto } from '../app/medicines/dto/create-medicine.dto';
-import { CreateMedicinesActivePrincipleDto } from 'src/app/medicines-active-principles/dto/create-medicines-active-principle.dto';
-import { MedicinesActivePrinciplesService } from 'src/app/medicines-active-principles/medicines-active-principles.service';
+import { CreateMedicinesActivePrincipleDto } from '../app/medicines-active-principles/dto/create-medicines-active-principle.dto';
+import { MedicinesActivePrinciplesService } from '../app/medicines-active-principles/medicines-active-principles.service';
 import { Action } from './dto/load.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -210,7 +210,6 @@ export class AppService {
           activePrincipleId: activePrincipleFound ? activePrincipleFound.id : 0,
           packageId: packageFound.id,
           presentationId: presentationFound.id,
-          stock: 0,
           concentration: '',
         };
 
@@ -219,6 +218,7 @@ export class AppService {
 
           const activePrincipleFound =
             await this.activePrinciplesService.findByName(value.trim());
+
           const concentrationData = concentration.name.includes('/')
             ? concentration.name.split('/')
             : ['S/I'];

@@ -24,11 +24,11 @@ export class MedicinesActivePrinciple {
 
   @ManyToOne(() => Presentation)
   @JoinColumn({ name: 'presentation_id', referencedColumnName: 'id' })
-  presentations: Presentation;
+  presentation: Presentation;
 
   @ManyToOne(() => Package)
   @JoinColumn({ name: 'package_id', referencedColumnName: 'id' })
-  packages: Package;
+  package: Package;
 
   @ManyToOne(() => Medicine, (medicine) => medicine.activePrinciples)
   @JoinColumn({ name: 'medicine_id', referencedColumnName: 'id' })
@@ -37,12 +37,6 @@ export class MedicinesActivePrinciple {
   @ManyToOne(() => ActivePrinciple)
   @JoinColumn({ name: 'active_principle_id', referencedColumnName: 'id' })
   activePrinciple: ActivePrinciple;
-
-  // @OneToMany(
-  //   () => MedicinesActivePrinciple,
-  //   (medicinesActivePrinciple) => medicinesActivePrinciple.medicine,
-  // )
-  // MedicinesActivePrinciple: MedicinesActivePrinciple[];
 
   @Exclude()
   @CreateDateColumn({

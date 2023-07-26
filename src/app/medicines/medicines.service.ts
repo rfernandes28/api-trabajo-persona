@@ -27,9 +27,8 @@ export class MedicinesService {
       where: { id },
       relations: [
         'activePrinciples.activePrinciple',
-        'activePrinciples.packages',
-        'activePrinciples.presentations',
-        // 'entranceOfMedicine',
+        'activePrinciples.package',
+        'activePrinciples.presentation',
       ],
     });
     if (!medicine) {

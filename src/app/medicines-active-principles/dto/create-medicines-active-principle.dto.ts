@@ -23,11 +23,6 @@ export class CreateMedicinesActivePrincipleDto {
   presentationId: number;
 
   @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty()
-  stock: number;
-
-  @IsNotEmpty()
   @ApiProperty()
   concentration: string;
 }

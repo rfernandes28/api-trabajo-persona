@@ -26,7 +26,7 @@ export class MedicinesActivePrinciplesService {
     const {
       medicineId,
       activePrincipleId,
-      stock,
+
       concentration,
       packageId,
       presentationId,
@@ -47,8 +47,8 @@ export class MedicinesActivePrinciplesService {
 
     medicinesActivePrinciple.medicine = medicine;
     medicinesActivePrinciple.activePrinciple = activePrinciple;
-    medicinesActivePrinciple.packages = packageData;
-    medicinesActivePrinciple.presentations = presentation;
+    medicinesActivePrinciple.package = packageData;
+    medicinesActivePrinciple.presentation = presentation;
     medicinesActivePrinciple.concentration = concentration;
 
     return this.medicinesActivePrincipleRepo.save(medicinesActivePrinciple);
