@@ -1,0 +1,25 @@
+
+
+nest g resource app/concentrations
+
+
+npm run migrations:generate ./src/configuration/database/migrations/segundo
+
+sudo docker inspect 174c2cd26d17  para busca la ip y agregarla en el pgadmin
+
+
+
+sudo docker compose start pgadmin
+
+
+
+pgadmin
+root@admin.com
+root
+
+
+
+nest g resource app/medicines-active-principles
+
+ @Column({ type: 'varchar', name: 'last_name', length: 255 })
+  lastName: string;
