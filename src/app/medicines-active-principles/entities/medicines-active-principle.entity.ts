@@ -7,11 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 import { ActivePrinciple } from '../../active-principles/entities/active-principle.entity';
-import { Presentation } from '../../presentations/entities/presentation.entity';
-import { Package } from '../../packages/entities/package.entity';
-import { Exclude } from 'class-transformer';
 import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 
 @Entity({ name: 'medicines_has_active_principles' })
@@ -21,14 +19,6 @@ export class MedicinesActivePrinciple {
 
   @Column({ type: 'varchar', length: 255 })
   concentration: string;
-
-  @ManyToOne(() => Presentation)
-  @JoinColumn({ name: 'presentation_id', referencedColumnName: 'id' })
-  presentation: Presentation;
-
-  @ManyToOne(() => Package)
-  @JoinColumn({ name: 'package_id', referencedColumnName: 'id' })
-  package: Package;
 
   @ManyToOne(
     () => CommercialPresentation,

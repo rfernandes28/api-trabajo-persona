@@ -10,6 +10,8 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
+import { Presentation } from '../../presentations/entities/presentation.entity';
+import { Package } from '../../packages/entities/package.entity';
 import { Medicine } from '../../medicines/entities/medicine.entity';
 
 @Entity({ name: 'commercial_presentations' })
@@ -26,6 +28,14 @@ export class CommercialPresentation {
   @ManyToOne(() => Medicine, (medicine) => medicine.commercialPresentations)
   @JoinColumn({ name: 'medicine_id', referencedColumnName: 'id' })
   medicine: Medicine;
+
+  @ManyToOne(() => Presentation)
+  @JoinColumn({ name: 'presentation_id', referencedColumnName: 'id' })
+  presentation: Presentation;
+
+  @ManyToOne(() => Package)
+  @JoinColumn({ name: 'package_id', referencedColumnName: 'id' })
+  package: Package;
 
   @OneToMany(
     () => MedicinesActivePrinciple,

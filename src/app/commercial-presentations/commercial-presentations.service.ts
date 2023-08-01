@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { CommercialPresentation } from './entities/commercial-presentation.entity';
 import { MedicinesService } from '../medicines/medicines.service';
+import { PackagesService } from '../packages/packages.service';
+import { PresentationsService } from '../presentations/presentations.service';
 
 @Injectable()
 export class CommercialPresentationsService {
@@ -15,20 +17,31 @@ export class CommercialPresentationsService {
     @InjectRepository(CommercialPresentation)
     private commercialPresentationRepo: Repository<CommercialPresentation>,
     private medicinesService: MedicinesService,
+    private packagesService: PackagesService,
+    private presentationsService: PresentationsService,
   ) {}
 
   async create(
     createCommercialPresentationDto: CreateCommercialPresentationDto,
   ) {
-    const { name, stock, medicineId } = createCommercialPresentationDto;
+    const { name, stock, medicineId, packageId, presentationId } =
+      createCommercialPresentationDto;
 
     const medicine = await this.medicinesService.findOne(medicineId);
+
+    const packageData = await this.packagesService.findOne(packageId);
+
+    const presentation = await this.presentationsService.findOne(
+      presentationId,
+    );
 
     const commercialPresentation = new CommercialPresentation();
 
     commercialPresentation.medicine = medicine;
     commercialPresentation.stock = stock;
     commercialPresentation.name = name;
+    commercialPresentation.package = packageData;
+    commercialPresentation.presentation = presentation;
 
     return this.commercialPresentationRepo.save(commercialPresentation);
   }

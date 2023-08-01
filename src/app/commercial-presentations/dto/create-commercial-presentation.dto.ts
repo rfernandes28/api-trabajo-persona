@@ -22,6 +22,16 @@ export class CreateCommercialPresentationDto {
   @IsPositive()
   @ApiProperty()
   medicineId: number;
+
+  @IsNotEmpty()
+  @IsPositive()
+  @ApiProperty()
+  packageId: number;
+
+  @IsNotEmpty()
+  @IsPositive()
+  @ApiProperty()
+  presentationId: number;
 }
 
 export class FilterCommercialPresentationDto {

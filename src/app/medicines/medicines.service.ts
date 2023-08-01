@@ -29,14 +29,9 @@ export class MedicinesService {
         'commercialPresentations',
         'commercialPresentations.activePrinciples',
         'commercialPresentations.activePrinciples.activePrinciple',
-        'commercialPresentations.activePrinciples.package',
-        'commercialPresentations.activePrinciples.presentation',
+        'commercialPresentations.package',
+        'commercialPresentations.presentation',
       ],
-      // relations: [
-      //   'activePrinciples.activePrinciple',
-      //   'activePrinciples.package',
-      //   'activePrinciples.presentation',
-      // ],
     });
     if (!medicine) {
       throw new NotFoundException(`Medicine #${id} not found`);

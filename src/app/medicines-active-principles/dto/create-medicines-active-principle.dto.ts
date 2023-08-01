@@ -13,16 +13,6 @@ export class CreateMedicinesActivePrincipleDto {
   activePrincipleId: number;
 
   @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty()
-  packageId: number;
-
-  @IsNotEmpty()
-  @IsPositive()
-  @ApiProperty()
-  presentationId: number;
-
-  @IsNotEmpty()
   @ApiProperty()
   concentration: string;
 }

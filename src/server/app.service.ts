@@ -234,9 +234,11 @@ export class AppService {
           const activePrincipleFound =
             await this.activePrinciplesService.findByName(value.trim());
 
-          const concentrationData = concentration.name.includes('/')
-            ? concentration.name.split('/')
-            : ['S/I'];
+          const concentrationData =
+            concentration.name.includes('/') &&
+            !concentration.name.includes('S/I')
+              ? concentration.name.split('/')
+              : ['S/I'];
 
           const newData = {
             ...data,
@@ -260,6 +262,7 @@ export class AppService {
           activePrincipleFound = await this.activePrinciplesService.findByName(
             cleanedActivePrincipleName,
           );
+
           data.activePrincipleId = activePrincipleFound.id;
           data.concentration = concentration.name.trim();
           arrayData.push(data);
@@ -282,6 +285,8 @@ export class AppService {
               name: value.medicineName + ' ' + value.concentration,
               stock: 0,
               medicineId: value.medicineId,
+              packageId: value.packageId,
+              presentationId: value.presentationId,
             };
 
             await this.commercialPresentationsService.create(dataCommercial);
