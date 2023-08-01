@@ -5,7 +5,7 @@ export class CreateMedicinesActivePrincipleDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty()
-  medicineId: number;
+  commercialPresentationId: number;
 
   @IsNotEmpty()
   @IsPositive()

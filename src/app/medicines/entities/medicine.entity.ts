@@ -8,8 +8,7 @@ import {
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
-
-import { MedicinesActivePrinciple } from '../../medicines-active-principles/entities/medicines-active-principle.entity';
+import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 
 @Entity({ name: 'medicines' })
 export class Medicine {
@@ -23,10 +22,10 @@ export class Medicine {
   location: string;
 
   @OneToMany(
-    () => MedicinesActivePrinciple,
-    (medicinesActivePrinciple) => medicinesActivePrinciple.medicine,
+    () => CommercialPresentation,
+    (commercialPresentation) => commercialPresentation.medicine,
   )
-  activePrinciples: MedicinesActivePrinciple[];
+  commercialPresentations: CommercialPresentation[];
 
   @Exclude()
   @CreateDateColumn({

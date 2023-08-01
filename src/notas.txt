@@ -1,6 +1,6 @@
 
 
-nest g resource app/concentrations
+nest g resource app/commercial-presentations
 
 
 npm run migrations:generate ./src/configuration/database/migrations/segundo

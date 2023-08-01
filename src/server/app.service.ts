@@ -16,9 +16,21 @@ import { CreateMedicineDto } from '../app/medicines/dto/create-medicine.dto';
 import { CreateMedicinesActivePrincipleDto } from '../app/medicines-active-principles/dto/create-medicines-active-principle.dto';
 import { MedicinesActivePrinciplesService } from '../app/medicines-active-principles/medicines-active-principles.service';
 import { Action } from './dto/load.dto';
+import { CommercialPresentationsService } from '../app/commercial-presentations/commercial-presentations.service';
+import { CreateCommercialPresentationDto } from '../app/commercial-presentations/dto/create-commercial-presentation.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Excel = require('exceljs');
+
+interface MedicineInfo {
+  medicineId: number;
+  medicineName: string;
+  commercialPresentationId: number;
+  activePrincipleId: number;
+  packageId: number;
+  presentationId: number;
+  concentration: string;
+}
 
 @Injectable()
 export class AppService {
@@ -26,6 +38,7 @@ export class AppService {
     private usersService: UsersService,
     private activePrinciplesService: ActivePrinciplesService,
     private medicinesService: MedicinesService,
+    private commercialPresentationsService: CommercialPresentationsService,
     private packagesService: PackagesService,
     private presentationsService: PresentationsService,
     private medicinesActivePrinciplesService: MedicinesActivePrinciplesService,
@@ -205,8 +218,10 @@ export class AppService {
           presentation.name,
         );
 
-        const data: CreateMedicinesActivePrincipleDto = {
+        const data = {
           medicineId: medicineFound.id,
+          medicineName: medicineFound.name,
+          commercialPresentationId: 0,
           activePrincipleId: activePrincipleFound ? activePrincipleFound.id : 0,
           packageId: packageFound.id,
           presentationId: presentationFound.id,
@@ -223,7 +238,7 @@ export class AppService {
             ? concentration.name.split('/')
             : ['S/I'];
 
-          const newData: CreateMedicinesActivePrincipleDto = {
+          const newData = {
             ...data,
             activePrincipleId: activePrincipleFound.id,
             concentration: concentrationData[index]
@@ -258,11 +273,46 @@ export class AppService {
               b.medicineId - a.medicineId,
           );
 
-          const uniqueArray = this.removeDuplicatesMultiple(arrayData);
+          const uniqueArray: any = this.removeDuplicatesMultiple(arrayData);
+
+          const transformedArray = this.transformArray(uniqueArray);
+
+          const processCommercial = async (value: any) => {
+            const dataCommercial: CreateCommercialPresentationDto = {
+              name: value.medicineName + ' ' + value.concentration,
+              stock: 0,
+              medicineId: value.medicineId,
+            };
+
+            await this.commercialPresentationsService.create(dataCommercial);
+          };
+
+          await Promise.all(transformedArray.map(processCommercial));
 
           const createMedicinesActivePrinciples = async (value) => {
+            const commercialPresentation =
+              await this.commercialPresentationsService.findAll({
+                medicineId: value.medicineId,
+              });
+
+            const commercialPresentationFound = commercialPresentation.filter(
+              (commercialPresentation: any) =>
+                commercialPresentation.name.includes(value.concentration),
+            );
+
+            delete value.medicineName;
+            delete value.medicineId;
+
+            const dataMedicinesActivePrinciples: CreateMedicinesActivePrincipleDto =
+              {
+                ...value,
+                commercialPresentationId: commercialPresentationFound[0].id,
+              };
+
             const medicinesHasActivePrinciples =
-              await this.medicinesActivePrinciplesService.create(value);
+              await this.medicinesActivePrinciplesService.create(
+                dataMedicinesActivePrinciples,
+              );
             console.log('response>', medicinesHasActivePrinciples.id);
           };
 
@@ -452,34 +502,6 @@ export class AppService {
     }
   }
 
-  async cell(data: Express.Multer.File) {
-    const workbook = new Excel.Workbook();
-    await workbook.xlsx.load(data.buffer);
-
-    const worksheet = workbook.getWorksheet('CCS 0322');
-
-    worksheet.eachRow(
-      (
-        row: {
-          eachCell: (
-            arg0: (cell: any, colNumber: any) => Promise<void>,
-          ) => void;
-        },
-        rowNumber: any,
-      ) => {
-        row.eachCell(async (cell: { value: any }, colNumber: any) => {
-          // Accede al valor de la celda con cell.value
-          console.log(
-            `col: ${colNumber}|| row: ${rowNumber} - Valor de la celda: ${cell.value}`,
-          );
-        });
-        console.log(
-          '------------------------------------------------------------ \n',
-        );
-      },
-    );
-  }
-
   async registerUser(users: any) {
     Promise.all(
       users.map(
@@ -540,4 +562,30 @@ export class AppService {
 
     return filteredData;
   }
+
+  transformArray = (inputArray: MedicineInfo[]): MedicineInfo[] => {
+    const result: { [key: string]: MedicineInfo } = {};
+
+    const keys = [];
+
+    inputArray.forEach((item) => {
+      const key = `${item.medicineId}`;
+      const key2 = `${item.medicineId}-${item.activePrincipleId}`;
+
+      if (!keys.find((element) => element === key2)) {
+        keys.push(key2);
+        if (!result[key]) {
+          result[key] = { ...item };
+          result[key].concentration = item.concentration;
+        } else {
+          result[key].concentration += ` ${item.concentration}`;
+        }
+      } else {
+        result[key2] = { ...item };
+        result[key2].concentration = item.concentration;
+      }
+    });
+
+    return Object.values(result);
+  };
 }

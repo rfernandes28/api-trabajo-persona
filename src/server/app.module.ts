@@ -18,6 +18,7 @@ import { PackagesModule } from '../app/packages/packages.module';
 import { OutletOfMedicinesModule } from '../app/outlet-of-medicines/outlet-of-medicines.module';
 import { EntranceOfMedicinesModule } from '../app/entrance-of-medicines/entrance-of-medicines.module';
 import { MedicinesActivePrinciplesModule } from '../app/medicines-active-principles/medicines-active-principles.module';
+import { CommercialPresentationsModule } from '../app/commercial-presentations/commercial-presentations.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { MedicinesActivePrinciplesModule } from '../app/medicines-active-princip
     StatusModule,
     UsersModule,
     OutletOfMedicinesModule,
+    CommercialPresentationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

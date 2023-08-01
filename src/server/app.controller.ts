@@ -63,14 +63,4 @@ export class AppController {
 
     return this.appService.loadMedicines(file, sheet, action);
   }
-
-  @Post('cell')
-  @ApiConsumes('multipart/form-data')
-  @ApiFile('file')
-  @UseInterceptors(FileInterceptor('file'))
-  cell(@UploadedFile() file: Express.Multer.File) {
-    console.log('file>>', file.originalname);
-
-    this.appService.cell(file);
-  }
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { OutletOfMedicinesService } from './outlet-of-medicines.service';
 import { CreateOutletOfMedicineDto } from './dto/create-outlet-of-medicine.dto';
@@ -30,20 +31,20 @@ export class OutletOfMedicinesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.outletOfMedicinesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.outletOfMedicinesService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateOutletOfMedicineDto: UpdateOutletOfMedicineDto,
   ) {
-    return this.outletOfMedicinesService.update(+id, updateOutletOfMedicineDto);
+    return this.outletOfMedicinesService.update(id, updateOutletOfMedicineDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.outletOfMedicinesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.outletOfMedicinesService.remove(id);
   }
 }

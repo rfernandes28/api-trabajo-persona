@@ -12,7 +12,7 @@ import { ActivePrinciple } from '../../active-principles/entities/active-princip
 import { Presentation } from '../../presentations/entities/presentation.entity';
 import { Package } from '../../packages/entities/package.entity';
 import { Exclude } from 'class-transformer';
-import { Medicine } from '../../medicines/entities/medicine.entity';
+import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 
 @Entity({ name: 'medicines_has_active_principles' })
 export class MedicinesActivePrinciple {
@@ -30,9 +30,15 @@ export class MedicinesActivePrinciple {
   @JoinColumn({ name: 'package_id', referencedColumnName: 'id' })
   package: Package;
 
-  @ManyToOne(() => Medicine, (medicine) => medicine.activePrinciples)
-  @JoinColumn({ name: 'medicine_id', referencedColumnName: 'id' })
-  medicine: Medicine;
+  @ManyToOne(
+    () => CommercialPresentation,
+    (commercialPresentation) => commercialPresentation.activePrinciples,
+  )
+  @JoinColumn({
+    name: 'commercial_presentation_id',
+    referencedColumnName: 'id',
+  })
+  commercialPresentation: CommercialPresentation;
 
   @ManyToOne(() => ActivePrinciple)
   @JoinColumn({ name: 'active_principle_id', referencedColumnName: 'id' })

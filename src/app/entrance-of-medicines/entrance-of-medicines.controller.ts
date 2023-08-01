@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EntranceOfMedicinesService } from './entrance-of-medicines.service';
 import { CreateEntranceOfMedicineDto } from './dto/create-entrance-of-medicine.dto';
@@ -30,23 +31,23 @@ export class EntranceOfMedicinesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.entranceOfMedicinesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.entranceOfMedicinesService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateEntranceOfMedicineDto: UpdateEntranceOfMedicineDto,
   ) {
     return this.entranceOfMedicinesService.update(
-      +id,
+      id,
       updateEntranceOfMedicineDto,
     );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.entranceOfMedicinesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.entranceOfMedicinesService.remove(id);
   }
 }

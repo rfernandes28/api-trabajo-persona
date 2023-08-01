@@ -8,13 +8,14 @@ import { MedicinesService } from '../medicines/medicines.service';
 import { ActivePrinciplesService } from '../active-principles/active-principles.service';
 import { PackagesService } from '../packages/packages.service';
 import { PresentationsService } from '../presentations/presentations.service';
+import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
 
 @Injectable()
 export class MedicinesActivePrinciplesService {
   constructor(
     @InjectRepository(MedicinesActivePrinciple)
     private medicinesActivePrincipleRepo: Repository<MedicinesActivePrinciple>,
-    private medicinesService: MedicinesService,
+    private commercialPresentationsService: CommercialPresentationsService,
     private activePrinciplesService: ActivePrinciplesService,
     private packagesService: PackagesService,
     private presentationsService: PresentationsService,
@@ -24,14 +25,17 @@ export class MedicinesActivePrinciplesService {
     createMedicinesActivePrincipleDto: CreateMedicinesActivePrincipleDto,
   ) {
     const {
-      medicineId,
+      commercialPresentationId,
       activePrincipleId,
-
       concentration,
       packageId,
       presentationId,
     } = createMedicinesActivePrincipleDto;
-    const medicine = await this.medicinesService.findOne(medicineId);
+
+    const commercialPresentation =
+      await this.commercialPresentationsService.findOne(
+        commercialPresentationId,
+      );
 
     const activePrinciple = await this.activePrinciplesService.findOne(
       activePrincipleId,
@@ -45,7 +49,7 @@ export class MedicinesActivePrinciplesService {
 
     const medicinesActivePrinciple = new MedicinesActivePrinciple();
 
-    medicinesActivePrinciple.medicine = medicine;
+    medicinesActivePrinciple.commercialPresentation = commercialPresentation;
     medicinesActivePrinciple.activePrinciple = activePrinciple;
     medicinesActivePrinciple.package = packageData;
     medicinesActivePrinciple.presentation = presentation;

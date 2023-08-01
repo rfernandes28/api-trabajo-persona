@@ -26,10 +26,17 @@ export class MedicinesService {
     const medicine = await this.medicineRepo.findOne({
       where: { id },
       relations: [
-        'activePrinciples.activePrinciple',
-        'activePrinciples.package',
-        'activePrinciples.presentation',
+        'commercialPresentations',
+        'commercialPresentations.activePrinciples',
+        'commercialPresentations.activePrinciples.activePrinciple',
+        'commercialPresentations.activePrinciples.package',
+        'commercialPresentations.activePrinciples.presentation',
       ],
+      // relations: [
+      //   'activePrinciples.activePrinciple',
+      //   'activePrinciples.package',
+      //   'activePrinciples.presentation',
+      // ],
     });
     if (!medicine) {
       throw new NotFoundException(`Medicine #${id} not found`);

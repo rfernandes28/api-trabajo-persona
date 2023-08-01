@@ -7,11 +7,13 @@ import { MedicinesModule } from '../medicines/medicines.module';
 import { ActivePrinciplesModule } from '../active-principles/active-principles.module';
 import { PackagesModule } from '../packages/packages.module';
 import { PresentationsModule } from '../presentations/presentations.module';
+import { CommercialPresentationsModule } from '../commercial-presentations/commercial-presentations.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MedicinesActivePrinciple]),
     MedicinesModule,
+    CommercialPresentationsModule,
     ActivePrinciplesModule,
     PackagesModule,
     PresentationsModule,

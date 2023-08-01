@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { MedicinesActivePrinciplesService } from './medicines-active-principles.service';
 import { CreateMedicinesActivePrincipleDto } from './dto/create-medicines-active-principle.dto';
@@ -35,24 +36,24 @@ export class MedicinesActivePrinciplesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicinesActivePrinciplesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.medicinesActivePrinciplesService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body()
     updateMedicinesActivePrincipleDto: UpdateMedicinesActivePrincipleDto,
   ) {
     return this.medicinesActivePrinciplesService.update(
-      +id,
+      id,
       updateMedicinesActivePrincipleDto,
     );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.medicinesActivePrinciplesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.medicinesActivePrinciplesService.remove(id);
   }
 }
