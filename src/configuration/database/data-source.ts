@@ -12,7 +12,7 @@ const dataSourceOptions: DataSourceOptions = {
   synchronize: false,
   logging: false,
   entities: [`src/**/*.entity.ts`],
-  migrations: [`src/configuration/database/migrations/*.ts`],
+  migrations: [`src/configuration/database/migrations/*.{.ts,.js}`],
   migrationsTableName: 'migrations',
 };
 

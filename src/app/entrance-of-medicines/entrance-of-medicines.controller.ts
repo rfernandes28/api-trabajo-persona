@@ -7,9 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { EntranceOfMedicinesService } from './entrance-of-medicines.service';
-import { CreateEntranceOfMedicineDto } from './dto/create-entrance-of-medicine.dto';
+import {
+  CreateEntranceOfMedicineDto,
+  FilterEntranceOfMedicineDto,
+} from './dto/create-entrance-of-medicine.dto';
 import { UpdateEntranceOfMedicineDto } from './dto/update-entrance-of-medicine.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -26,8 +30,8 @@ export class EntranceOfMedicinesController {
   }
 
   @Get()
-  findAll() {
-    return this.entranceOfMedicinesService.findAll();
+  findAll(@Query() params: FilterEntranceOfMedicineDto) {
+    return this.entranceOfMedicinesService.findAll(params);
   }
 
   @Get(':id')

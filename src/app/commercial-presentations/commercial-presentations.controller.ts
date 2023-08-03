@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CommercialPresentationsService } from './commercial-presentations.service';
 import {
   CreateCommercialPresentationDto,
@@ -16,6 +17,7 @@ import {
 } from './dto/create-commercial-presentation.dto';
 import { UpdateCommercialPresentationDto } from './dto/update-commercial-presentation.dto';
 
+@ApiTags('commercial-presentations')
 @Controller('commercial-presentations')
 export class CommercialPresentationsController {
   constructor(

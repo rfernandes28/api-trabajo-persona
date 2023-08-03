@@ -59,6 +59,7 @@ export class CommercialPresentationsService {
         where,
         take: limit,
         skip: offset,
+        relations: ['medicine', 'package', 'presentation'],
       });
     }
 
@@ -67,7 +68,10 @@ export class CommercialPresentationsService {
 
   async findOne(id: number) {
     const commercialPresentationData =
-      await this.commercialPresentationRepo.findOneBy({ id });
+      await this.commercialPresentationRepo.findOne({
+        where: { id },
+        relations: ['medicine', 'package', 'presentation'],
+      });
     if (!commercialPresentationData) {
       throw new NotFoundException(`CommercialPresentation #${id} not found`);
     }

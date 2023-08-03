@@ -18,6 +18,8 @@ import { MedicinesActivePrinciplesService } from '../app/medicines-active-princi
 import { Action } from './dto/load.dto';
 import { CommercialPresentationsService } from '../app/commercial-presentations/commercial-presentations.service';
 import { CreateCommercialPresentationDto } from '../app/commercial-presentations/dto/create-commercial-presentation.dto';
+import { EntranceOfMedicinesService } from '../app/entrance-of-medicines/entrance-of-medicines.service';
+import { CreateEntranceOfMedicineDto } from '../app/entrance-of-medicines/dto/create-entrance-of-medicine.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Excel = require('exceljs');
@@ -41,6 +43,7 @@ export class AppService {
     private commercialPresentationsService: CommercialPresentationsService,
     private packagesService: PackagesService,
     private presentationsService: PresentationsService,
+    private entranceOfMedicinesService: EntranceOfMedicinesService,
     private medicinesActivePrinciplesService: MedicinesActivePrinciplesService,
   ) {}
 
@@ -67,6 +70,16 @@ export class AppService {
 
       const concentrationColArray = worksheet.getColumn(6).values;
 
+      const boxesQuantityColArray = worksheet.getColumn(7).values;
+
+      const unitQuantityColArray = worksheet.getColumn(8).values;
+
+      const expirationColArray = worksheet.getColumn(10).values;
+
+      const expireyColArray = worksheet.getColumn(11).values;
+
+      const donorColArray = worksheet.getColumn(13).values;
+
       const newMedicine: any = [];
 
       const newActivePrinciples: any = [];
@@ -77,6 +90,8 @@ export class AppService {
 
       const newConcentration: any = [];
 
+      const newEntraceOfMedicines: any = [];
+
       activePrincipleColArray.map(
         async (activePrinciple: any, index: number) => {
           let medicine = medicineColArray[index];
@@ -84,6 +99,12 @@ export class AppService {
           let packageData = packageColArray[index];
           let presentation = presentationColArray[index];
           let concentration = concentrationColArray[index];
+
+          const boxesQuantity = boxesQuantityColArray[index];
+          let unitQuantity = unitQuantityColArray[index];
+          const expiration = expirationColArray[index];
+          const expire = expireyColArray[index];
+          const donor = donorColArray[index];
 
           if (index !== 4) {
             if (typeof medicine === 'object') {
@@ -122,6 +143,30 @@ export class AppService {
                 : 's/i';
               newActivePrinciples.push({
                 name: activePrinciple.toUpperCase(),
+              });
+            } else if (action === Action.ENTRADAS) {
+              if (typeof unitQuantity === 'object') {
+                unitQuantity = unitQuantity.result ? unitQuantity.result : 0;
+              }
+              concentration = concentration
+                ? concentration
+                    .toUpperCase()
+                    .split('/')
+                    .map((value: string) => value.trim())
+                    .join(' ')
+                : 'S/I';
+
+              newEntraceOfMedicines.push({
+                medicine: medicine.toUpperCase(),
+                concentration,
+                activePrinciple: activePrinciple
+                  ? activePrinciple.trim()
+                  : 'S/I',
+                boxesQuantity: boxesQuantity ? boxesQuantity : 0,
+                unitQuantity: unitQuantity,
+                expiration,
+                expire: expire.result === 'EXPIRO' ? true : false,
+                donor,
               });
             }
 
@@ -182,6 +227,9 @@ export class AppService {
           newPresentation,
           newConcentration,
         );
+      } else if (action === Action.ENTRADAS) {
+        console.log('entro en entradas de medicamentos');
+        await this.registerEntranceOfMedicines(newEntraceOfMedicines);
       }
     } catch (error: any) {
       Logger.error(error, AppService.name);
@@ -325,6 +373,57 @@ export class AppService {
         }
       }),
     );
+  }
+
+  async registerEntranceOfMedicines(medicines: any) {
+    // console.log('medicines:', medicines);
+
+    try {
+      return Promise.all(
+        medicines.map(async (data) => {
+          const {
+            medicine,
+            concentration,
+            boxesQuantity,
+            unitQuantity,
+            expiration,
+            expire,
+            donor,
+          } = data;
+
+          const medicineFound = await this.medicinesService.findByName(
+            medicine,
+          );
+
+          const commercialPresentation =
+            await this.commercialPresentationsService.findAll({
+              medicineId: medicineFound.id,
+            });
+
+          const commercialPresentationFound = commercialPresentation.filter(
+            (commercialPresentation: any) =>
+              commercialPresentation.name.includes(concentration),
+          )[0];
+
+          if (commercialPresentationFound) {
+            const dataEntranceOfMedicines: CreateEntranceOfMedicineDto = {
+              commercialPresentationId: commercialPresentationFound.id,
+              boxesQuantity,
+              unitQuantity,
+              expiration,
+              expire,
+              donor,
+            };
+
+            return await this.entranceOfMedicinesService.create(
+              dataEntranceOfMedicines,
+            );
+          }
+        }),
+      );
+    } catch (error) {
+      return error;
+    }
   }
 
   async registerMedicine(medicines: any) {
@@ -576,6 +675,10 @@ export class AppService {
     inputArray.forEach((item) => {
       const key = `${item.medicineId}`;
       const key2 = `${item.medicineId}-${item.activePrincipleId}`;
+
+      console.log('keys:', keys);
+      console.log('key:', key);
+      console.log('key2:', key2);
 
       if (!keys.find((element) => element === key2)) {
         keys.push(key2);

@@ -36,10 +36,15 @@ export class CreateEntranceOfMedicineDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty()
-  readonly medicineId: number;
+  readonly commercialPresentationId: number;
 }
 
 export class FilterEntranceOfMedicineDto {
+  @IsOptional()
+  @IsPositive()
+  @ApiProperty()
+  readonly commercialPresentationId: number;
+
   @IsPositive()
   @IsOptional()
   @ApiProperty()

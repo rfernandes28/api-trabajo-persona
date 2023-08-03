@@ -1,12 +1,16 @@
-import { MedicinesActivePrinciple } from '../../medicines-active-principles/entities/medicines-active-principle.entity';
+import { getDataSourceName } from '@nestjs/typeorm';
+import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 import {
+  AfterInsert,
   Column,
   CreateDateColumn,
+  DataSource,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  getManager,
 } from 'typeorm';
 
 @Entity({ name: 'entrance_of_medicines' })
@@ -29,12 +33,12 @@ export class EntranceOfMedicine {
   @Column({ type: 'varchar', length: 255, nullable: true })
   donor: string;
 
-  @ManyToOne(() => MedicinesActivePrinciple)
+  @ManyToOne(() => CommercialPresentation)
   @JoinColumn({
-    name: 'medicines_active_principle_id',
+    name: 'commercial_presentation_id',
     referencedColumnName: 'id',
   })
-  medicinesActivePrinciple: MedicinesActivePrinciple;
+  commercialPresentation: CommercialPresentation;
 
   @CreateDateColumn({
     name: 'create_at',
@@ -49,4 +53,15 @@ export class EntranceOfMedicine {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;
+
+  // @AfterInsert()
+  // async resetCounters() {
+  //   console.log('AfterInsert>>');
+
+  //     getRepository(CommercialPresentation)
+  //     .createQueryBuilder()
+  //     .update(CommercialPresentation)
+  //     .set({ stock: () => 'stock + :unitQuantity' })
+  //     .setParameters({ unitQuantity: this.unitQuantity });
+  // }
 }
