@@ -15,17 +15,17 @@ export enum Action {
   SALIDAS = 'SALIDAS',
 }
 
-export enum SheetUser {
+export enum SheetPatient {
   CCS_0322 = 'CCS 0322',
 }
 
-export class LoadUserDto {
+export class LoadPatientDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({
     description: 'Seleccionar la hoja a cargar',
   })
-  readonly sheet: SheetUser;
+  readonly sheet: SheetPatient;
 }
 
 export class loadMedicineDto {

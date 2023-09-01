@@ -1,13 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min,
+} from 'class-validator';
 
-export class CreateUserDto {
-  @IsOptional()
+export class CreatePatientDto {
+  @IsNotEmpty()
   @IsString()
   @ApiProperty()
   readonly name: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @ApiProperty()
   readonly lastName: string;
@@ -15,30 +21,20 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   @ApiProperty()
-  readonly userName: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
   readonly identificationNumber: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  readonly email: string;
+  readonly code: string;
 
   @IsOptional()
   @IsString()
   @ApiProperty()
-  readonly password: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
-  readonly role: string;
+  readonly note: string;
 }
 
-export class FilterUserDto {
+export class FilterPatientDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty()

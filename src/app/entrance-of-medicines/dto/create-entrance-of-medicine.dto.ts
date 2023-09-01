@@ -43,7 +43,7 @@ export class FilterEntranceOfMedicineDto {
   @IsOptional()
   @IsPositive()
   @ApiProperty()
-  readonly commercialPresentationId: number;
+  readonly commercialPresentationId?: number;
 
   @IsPositive()
   @IsOptional()

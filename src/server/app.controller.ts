@@ -1,5 +1,6 @@
 import {
   Controller,
+  InternalServerErrorException,
   Logger,
   Post,
   Query,
@@ -10,14 +11,14 @@ import { AppService } from './app.service';
 import { ApiConsumes, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiFile } from '../decorators/apiFile.decorator';
-import { LoadUserDto, loadMedicineDto } from './dto/load.dto';
+import { LoadPatientDto, loadMedicineDto } from './dto/load.dto';
 
 @ApiTags('master')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('load-users')
+  @Post('load-patients')
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Carga de pacientes',
@@ -26,17 +27,19 @@ export class AppController {
   })
   @ApiFile('file')
   @UseInterceptors(FileInterceptor('file'))
-  loadUsers(
+  loadPatients(
     @UploadedFile() file: Express.Multer.File,
-    @Query() loadDto: LoadUserDto,
+    @Query() loadDto: LoadPatientDto,
   ) {
+    if (!file)
+      throw new InternalServerErrorException('No se ha encontrado el archivo');
     const { sheet } = loadDto;
     Logger.log(
-      `loadUsers> fileName: ${file.originalname} sheet: ${sheet}`,
+      `loadPatients> fileName: ${file.originalname} sheet: ${sheet}`,
       AppController.name,
     );
 
-    this.appService.loadUsers(file, sheet);
+    this.appService.loadPatients(file, sheet);
   }
 
   @Post('load-medicines')
@@ -52,12 +55,13 @@ export class AppController {
     @UploadedFile() file: Express.Multer.File,
     @Query() loadDto: loadMedicineDto,
   ) {
+    if (!file)
+      throw new InternalServerErrorException('No se ha encontrado el archivo');
+
     const { sheet, action } = loadDto;
 
-    console.log('action ctrl>>', action);
-
     Logger.log(
-      `loadMedicines> fileName: ${file.originalname} sheet: ${sheet}`,
+      `loadMedicines> fileName: ${file.originalname} sheet: ${sheet}, accion: ${action}`,
       AppController.name,
     );
 

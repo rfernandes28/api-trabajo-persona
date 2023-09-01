@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 import { enviroments } from '../configuration/enviroments';
 import config from '../configuration/config';
 import { DatabaseModule } from '../configuration/database/database.module';
-import { UsersModule } from '../app/users/users.module';
+import { PatientsModule } from '../app/patients/patients.module';
 import { PathologiesModule } from '../app/pathologies/pathologies.module';
 import { PresentationsModule } from '../app/presentations/presentations.module';
 import { MedicinesModule } from '../app/medicines/medicines.module';
@@ -49,7 +49,7 @@ import { CommercialPresentationsModule } from '../app/commercial-presentations/c
     PresentationsModule,
     PrioritiesModule,
     StatusModule,
-    UsersModule,
+    PatientsModule,
     OutletOfMedicinesModule,
     CommercialPresentationsModule,
   ],

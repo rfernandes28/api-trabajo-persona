@@ -6,19 +6,16 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'users' })
-export class User {
+@Entity({ name: 'patients' })
+export class Patient {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ name: 'last_name', type: 'varchar', length: 255, nullable: true })
+  @Column({ name: 'last_name', type: 'varchar', length: 255 })
   lastName: string;
-
-  @Column({ name: 'user_name', type: 'varchar', length: 255, nullable: true })
-  userName: string;
 
   @Column({
     name: 'identification_number',
@@ -28,14 +25,11 @@ export class User {
   })
   identificationNumber: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  email: string;
+  @Column({ type: 'varchar', length: 255 })
+  code: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  password: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  role: string;
+  note: string;
 
   @CreateDateColumn({
     name: 'create_at',

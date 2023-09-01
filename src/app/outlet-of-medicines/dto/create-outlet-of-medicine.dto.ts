@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsPositive } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsPositive, Min } from 'class-validator';
 
 export class CreateOutletOfMedicineDto {
   @IsNotEmpty()
@@ -11,4 +11,21 @@ export class CreateOutletOfMedicineDto {
   @IsPositive()
   @ApiProperty()
   readonly medicineId: number;
+}
+
+export class FilterOutletOfMedicineDto {
+  @IsOptional()
+  @IsPositive()
+  @ApiProperty()
+  readonly commercialPresentationId?: number;
+
+  @IsPositive()
+  @IsOptional()
+  @ApiProperty()
+  readonly limit?: number;
+
+  @Min(0)
+  @IsOptional()
+  @ApiProperty()
+  readonly offset?: number;
 }

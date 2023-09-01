@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-import { CreateMedicineDto } from './dto/create-medicine.dto';
+import {
+  CreateMedicineDto,
+  FilterMedicineDto,
+} from './dto/create-medicine.dto';
 import { UpdateMedicineDto } from './dto/update-medicine.dto';
 import { Medicine } from './entities/medicine.entity';
 
@@ -18,7 +21,18 @@ export class MedicinesService {
     return this.medicineRepo.save(newMedicine);
   }
 
-  findAll() {
+  findAll(params?: FilterMedicineDto) {
+    if (params) {
+      const where: FindOptionsWhere<Medicine> = {};
+      const { limit, offset } = params;
+
+      return this.medicineRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+      });
+    }
+
     return this.medicineRepo.find();
   }
 

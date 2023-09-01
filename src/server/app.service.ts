@@ -3,8 +3,8 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { UsersService } from '../app/users/users.service';
-import { CreateUserDto } from '../app/users/dto/create-user.dto';
+import { PatientsService } from '../app/patients/patients.service';
+import { CreatePatientDto } from '../app/patients/dto/create-patient.dto';
 import { ActivePrinciplesService } from '../app/active-principles/active-principles.service';
 import { CreateActivePrincipleDto } from '../app/active-principles/dto/create-active-principle.dto';
 import { PresentationsService } from '../app/presentations/presentations.service';
@@ -37,7 +37,7 @@ interface MedicineInfo {
 @Injectable()
 export class AppService {
   constructor(
-    private usersService: UsersService,
+    private patientsService: PatientsService,
     private activePrinciplesService: ActivePrinciplesService,
     private medicinesService: MedicinesService,
     private commercialPresentationsService: CommercialPresentationsService,
@@ -129,6 +129,28 @@ export class AppService {
               activePrinciple = nameArray[0].text;
             }
 
+            if (typeof packageData === 'object') {
+              const nameArray = packageData.richText;
+              packageData = nameArray[0].text;
+            }
+            packageData = packageData ? packageData.trim() : 's/i';
+
+            newPackage.push({ name: packageData.toUpperCase() });
+
+            if (typeof presentation === 'object') {
+              const nameArray = presentation.richText;
+              presentation = nameArray[0].text;
+            }
+            presentation = presentation ? presentation.trim() : 's/i';
+            newPresentation.push({ name: presentation.toUpperCase() });
+
+            if (typeof concentration === 'object') {
+              const nameArray = presentation.richText;
+              concentration = nameArray[0].text;
+            }
+            concentration = concentration ? concentration.trim() : 's/i';
+            newConcentration.push({ name: concentration.toUpperCase() });
+
             if (action === Action.CARGAR) {
               activePrinciple.split('/').map((value: string) => {
                 value = value.replace(/\s+/g, ' ');
@@ -165,38 +187,18 @@ export class AppService {
                 boxesQuantity: boxesQuantity ? boxesQuantity : 0,
                 unitQuantity: unitQuantity,
                 expiration,
+                packageData: packageData.toUpperCase(),
+                presentation: presentation.toUpperCase(),
                 expire: expire.result === 'EXPIRO' ? true : false,
                 donor,
               });
             }
-
-            if (typeof packageData === 'object') {
-              const nameArray = packageData.richText;
-              packageData = nameArray[0].text;
-            }
-            packageData = packageData ? packageData.trim() : 's/i';
-
-            newPackage.push({ name: packageData.toUpperCase() });
-
-            if (typeof presentation === 'object') {
-              const nameArray = presentation.richText;
-              presentation = nameArray[0].text;
-            }
-            presentation = presentation ? presentation.trim() : 's/i';
-            newPresentation.push({ name: presentation.toUpperCase() });
-
-            if (typeof concentration === 'object') {
-              const nameArray = presentation.richText;
-              concentration = nameArray[0].text;
-            }
-            concentration = concentration ? concentration.trim() : 's/i';
-            newConcentration.push({ name: concentration.toUpperCase() });
           }
         },
       );
 
       if (action === Action.CARGAR) {
-        console.log('entro en cargar');
+        Logger.verbose('Accion de cargar');
 
         const uniqueMedicineArray = this.removeDuplicates(newMedicine, 'name');
 
@@ -219,7 +221,8 @@ export class AppService {
           await this.registerPresentation(uniquePresentationArray),
         ]);
       } else if (action === Action.REGISTRAR) {
-        console.log('entro en registro');
+        Logger.verbose('Accion de registro');
+
         await this.registerMedicineHasActivePrinciples(
           newMedicine,
           newActivePrinciples,
@@ -228,7 +231,7 @@ export class AppService {
           newConcentration,
         );
       } else if (action === Action.ENTRADAS) {
-        console.log('entro en entradas de medicamentos');
+        Logger.verbose('Accion de registro de entradas de medicamentos');
         await this.registerEntranceOfMedicines(newEntraceOfMedicines);
       }
     } catch (error: any) {
@@ -246,138 +249,144 @@ export class AppService {
     newConcentration: any[],
   ) {
     let arrayData: any = [];
-    await Promise.all(
-      newMedicine.map(async (medicine: any, index: number) => {
-        const activePrinciple = newActivePrinciples[index];
-        const packageData = newPackage[index];
-        const presentation = newPresentation[index];
-        const concentration = newConcentration[index];
-        let activePrincipleFound = null;
 
-        const medicineFound = await this.medicinesService.findByName(
-          medicine.name,
-        );
+    for (const [index, medicine] of newMedicine.entries()) {
+      const activePrinciple = newActivePrinciples[index];
+      const packageData = newPackage[index];
+      const presentation = newPresentation[index];
+      const concentration = newConcentration[index];
+      let activePrincipleFound = null;
 
-        const packageFound = await this.packagesService.findByName(
-          packageData.name,
-        );
+      const medicineFound = await this.medicinesService.findByName(
+        medicine.name,
+      );
 
-        const presentationFound = await this.presentationsService.findByName(
-          presentation.name,
-        );
+      const packageFound = await this.packagesService.findByName(
+        packageData.name,
+      );
 
-        const data = {
-          medicineId: medicineFound.id,
-          medicineName: medicineFound.name,
-          commercialPresentationId: 0,
-          activePrincipleId: activePrincipleFound ? activePrincipleFound.id : 0,
-          packageId: packageFound.id,
-          presentationId: presentationFound.id,
-          concentration: '',
+      const presentationFound = await this.presentationsService.findByName(
+        presentation.name,
+      );
+
+      const data = {
+        medicineId: medicineFound.id,
+        medicineName: medicineFound.name,
+        commercialPresentationId: 0,
+        activePrincipleId: activePrincipleFound ? activePrincipleFound.id : 0,
+        packageId: packageFound.id,
+        presentationId: presentationFound.id,
+        concentration: '',
+      };
+
+      const processActivePrinciple = async (value: string, index: number) => {
+        value = value.replace(/\s+/g, ' ');
+
+        const activePrincipleFound =
+          await this.activePrinciplesService.findByName(value.trim());
+
+        const concentrationData =
+          concentration.name.includes('/') &&
+          !concentration.name.includes('S/I')
+            ? concentration.name.split('/')
+            : ['S/I'];
+
+        const newData = {
+          ...data,
+          activePrincipleId: activePrincipleFound.id,
+          concentration: concentrationData[index]
+            ? concentrationData[index].trim()
+            : 'S/I',
         };
+        console.log('newData', newData);
+        arrayData.push(newData);
+      };
 
-        const processActivePrinciple = async (value: string, index: number) => {
-          value = value.replace(/\s+/g, ' ');
+      if (activePrinciple.name.includes('/')) {
+        await Promise.all(
+          activePrinciple.name.split('/').map(processActivePrinciple),
+        );
+      } else {
+        const cleanedActivePrincipleName = activePrinciple.name
+          .replace(/\s+/g, ' ')
+          .trim();
 
-          const activePrincipleFound =
-            await this.activePrinciplesService.findByName(value.trim());
+        activePrincipleFound = await this.activePrinciplesService.findByName(
+          cleanedActivePrincipleName,
+        );
 
-          const concentrationData =
-            concentration.name.includes('/') &&
-            !concentration.name.includes('S/I')
-              ? concentration.name.split('/')
-              : ['S/I'];
+        data.activePrincipleId = activePrincipleFound.id;
+        data.concentration = concentration.name.trim();
+        arrayData.push(data);
+      }
 
-          const newData = {
-            ...data,
-            activePrincipleId: activePrincipleFound.id,
-            concentration: concentrationData[index]
-              ? concentrationData[index].trim()
-              : 'S/I',
+      if (newMedicine.length - 1 === index) {
+        console.log('ultimo \n');
+
+        arrayData = arrayData.sort(
+          (a: { medicineId: number }, b: { medicineId: number }) =>
+            b.medicineId - a.medicineId,
+        );
+
+        const uniqueArray: any = this.removeDuplicatesMultiple(arrayData);
+
+        const transformedArray = this.transformArray(uniqueArray);
+
+        await this.processCommercial(transformedArray);
+
+        await this.createMedicinesActivePrinciples(uniqueArray);
+      }
+    }
+  }
+
+  async processCommercial(data: any) {
+    for (const value of data) {
+      const dataCommercial: CreateCommercialPresentationDto = {
+        name: value.medicineName,
+        stock: 0,
+        medicineId: value.medicineId,
+        packageId: value.packageId,
+        presentationId: value.presentationId,
+      };
+
+      console.log('dataCommercial>>', dataCommercial);
+
+      await this.commercialPresentationsService.create(dataCommercial);
+    }
+  }
+
+  async createMedicinesActivePrinciples(data) {
+    for (const value of data) {
+      const commercialPresentation =
+        await this.commercialPresentationsService.findAll({
+          medicineId: value.medicineId,
+        });
+
+      const commercialPresentationFound = commercialPresentation.filter(
+        (commercialPresentation: any) =>
+          commercialPresentation.name.includes(value.concentration) &&
+          commercialPresentation.package.id === value.packageId &&
+          commercialPresentation.presentation.id === value.presentationId,
+      );
+
+      if (commercialPresentationFound.length > 0) {
+        delete value.medicineName;
+        delete value.medicineId;
+
+        const dataMedicinesActivePrinciples: CreateMedicinesActivePrincipleDto =
+          {
+            ...value,
+            commercialPresentationId: commercialPresentationFound[0].id,
           };
 
-          arrayData.push(newData);
-        };
-
-        if (activePrinciple.name.includes('/')) {
-          await Promise.all(
-            activePrinciple.name.split('/').map(processActivePrinciple),
-          );
-        } else {
-          const cleanedActivePrincipleName = activePrinciple.name
-            .replace(/\s+/g, ' ')
-            .trim();
-          activePrincipleFound = await this.activePrinciplesService.findByName(
-            cleanedActivePrincipleName,
-          );
-
-          data.activePrincipleId = activePrincipleFound.id;
-          data.concentration = concentration.name.trim();
-          arrayData.push(data);
-        }
-
-        if (newMedicine.length - 1 === index) {
-          console.log('soy el ultimo', arrayData.length);
-
-          arrayData = arrayData.sort(
-            (a: { medicineId: number }, b: { medicineId: number }) =>
-              b.medicineId - a.medicineId,
-          );
-
-          const uniqueArray: any = this.removeDuplicatesMultiple(arrayData);
-
-          const transformedArray = this.transformArray(uniqueArray);
-
-          const processCommercial = async (value: any) => {
-            const dataCommercial: CreateCommercialPresentationDto = {
-              name: value.medicineName + ' ' + value.concentration,
-              stock: 0,
-              medicineId: value.medicineId,
-              packageId: value.packageId,
-              presentationId: value.presentationId,
-            };
-
-            await this.commercialPresentationsService.create(dataCommercial);
-          };
-
-          await Promise.all(transformedArray.map(processCommercial));
-
-          const createMedicinesActivePrinciples = async (value) => {
-            const commercialPresentation =
-              await this.commercialPresentationsService.findAll({
-                medicineId: value.medicineId,
-              });
-
-            const commercialPresentationFound = commercialPresentation.filter(
-              (commercialPresentation: any) =>
-                commercialPresentation.name.includes(value.concentration),
-            );
-
-            delete value.medicineName;
-            delete value.medicineId;
-
-            const dataMedicinesActivePrinciples: CreateMedicinesActivePrincipleDto =
-              {
-                ...value,
-                commercialPresentationId: commercialPresentationFound[0].id,
-              };
-
-            const medicinesHasActivePrinciples =
-              await this.medicinesActivePrinciplesService.create(
-                dataMedicinesActivePrinciples,
-              );
-            console.log('response>', medicinesHasActivePrinciples.id);
-          };
-
-          await Promise.all(uniqueArray.map(createMedicinesActivePrinciples));
-        }
-      }),
-    );
+        await this.medicinesActivePrinciplesService.create(
+          dataMedicinesActivePrinciples,
+        );
+      }
+    }
   }
 
   async registerEntranceOfMedicines(medicines: any) {
-    // console.log('medicines:', medicines);
-
     try {
       return Promise.all(
         medicines.map(async (data) => {
@@ -389,6 +398,8 @@ export class AppService {
             expiration,
             expire,
             donor,
+            packageData,
+            presentation,
           } = data;
 
           const medicineFound = await this.medicinesService.findByName(
@@ -402,7 +413,9 @@ export class AppService {
 
           const commercialPresentationFound = commercialPresentation.filter(
             (commercialPresentation: any) =>
-              commercialPresentation.name.includes(concentration),
+              commercialPresentation.name.includes(concentration) &&
+              commercialPresentation.presentation.name === presentation &&
+              commercialPresentation.package.name === packageData,
           )[0];
 
           if (commercialPresentationFound) {
@@ -544,7 +557,7 @@ export class AppService {
 
   ////////////
 
-  async loadUsers(data: Express.Multer.File, sheet: string) {
+  async loadPatients(data: Express.Multer.File, sheet: string) {
     try {
       const workbook = new Excel.Workbook();
       await workbook.xlsx.load(data.buffer);
@@ -559,7 +572,7 @@ export class AppService {
 
       const identificationNumberColArray = worksheet.getColumn(42).values;
 
-      const newUsers: any = [];
+      const newPatients: any = [];
 
       codeColArray.map(async (code: any, index: number) => {
         let name = nameColArray[index];
@@ -584,7 +597,7 @@ export class AppService {
           name = nameSlit[0].trim();
           note = nameSlit.length === 2 ? nameSlit[1].replace(')', '') : note;
 
-          newUsers.push({
+          newPatients.push({
             code,
             name,
             lastName: lastName ? lastName.trim() : 's/i',
@@ -596,9 +609,9 @@ export class AppService {
         }
       });
 
-      const uniqueArray = this.removeDuplicates(newUsers, 'code');
+      const uniqueArray = this.removeDuplicates(newPatients, 'code');
 
-      await this.registerUser(uniqueArray);
+      await this.registerPatient(uniqueArray);
     } catch (error: any) {
       Logger.error(error, AppService.name);
 
@@ -606,21 +619,21 @@ export class AppService {
     }
   }
 
-  async registerUser(users: any) {
+  async registerPatient(patients: any) {
     Promise.all(
-      users.map(
-        async (user: {
+      patients.map(
+        async (patient: {
           code: string;
           name: string;
           lastName: string;
           identificationNumber: string;
           note: string;
         }) => {
-          const { code, name, lastName, identificationNumber, note } = user;
-          const userFound = await this.usersService.findByCode(code);
+          const { code, name, lastName, identificationNumber, note } = patient;
+          const patientFound = await this.patientsService.findByCode(code);
 
-          if (!userFound) {
-            const data: CreateUserDto = {
+          if (!patientFound) {
+            const data: CreatePatientDto = {
               name,
               lastName,
               code,
@@ -628,7 +641,7 @@ export class AppService {
               note,
             };
 
-            await this.usersService.create(data);
+            await this.patientsService.create(data);
           }
         },
       ),
@@ -673,27 +686,45 @@ export class AppService {
     const keys = [];
 
     inputArray.forEach((item) => {
-      const key = `${item.medicineId}`;
-      const key2 = `${item.medicineId}-${item.activePrincipleId}`;
+      const key2 = `${item.medicineId}-${item.activePrincipleId}-${item.packageId}-${item.presentationId}`;
+      const key3 = `${item.medicineId}-${item.activePrincipleId}-${item.packageId}-${item.presentationId}-${item.concentration}`;
 
-      console.log('keys:', keys);
-      console.log('key:', key);
-      console.log('key2:', key2);
-
-      if (!keys.find((element) => element === key2)) {
-        keys.push(key2);
-        if (!result[key]) {
-          result[key] = { ...item };
-          result[key].concentration = item.concentration;
+      if (!keys.find((element) => element === key3)) {
+        keys.push(key3);
+        if (!result[key2]) {
+          result[key2] = { ...item };
+          result[key2].concentration = item.concentration;
         } else {
-          result[key].concentration += ` ${item.concentration}`;
+          result[key2].concentration += ` ${item.concentration}`;
         }
       } else {
-        result[key2] = { ...item };
-        result[key2].concentration = item.concentration;
+        result[key3] = { ...item };
+        result[key3].concentration = item.concentration;
       }
     });
 
-    return Object.values(result);
+    const resultArray = Object.values(result);
+
+    return this.removeDuplicatesMultipleV2(resultArray);
   };
+
+  removeDuplicatesMultipleV2(originalArray: any[]) {
+    const filteredData = originalArray.filter(
+      (objeto, index, self) =>
+        index ===
+        self.findIndex((o) => {
+          if (
+            o.medicineId === objeto.medicineId &&
+            o.packageId === objeto.packageId &&
+            o.presentationId === objeto.presentationId
+          ) {
+            o.medicineName = `${o.medicineName} ${objeto.concentration}`;
+
+            return true;
+          }
+        }),
+    );
+
+    return filteredData;
+  }
 }
