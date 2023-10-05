@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { PathologiesService } from './pathologies.service';
-import { CreatePathologyDto } from './dto/create-pathology.dto';
+import {
+  CreatePathologyDto,
+  FilterPathologyDto,
+} from './dto/create-pathology.dto';
 import { UpdatePathologyDto } from './dto/update-pathology.dto';
 
 @ApiTags('pathologies')
@@ -25,8 +29,8 @@ export class PathologiesController {
   }
 
   @Get()
-  findAll() {
-    return this.pathologiesService.findAll();
+  findAll(@Query() params: FilterPathologyDto) {
+    return this.pathologiesService.findAll(params);
   }
 
   @Get(':id')

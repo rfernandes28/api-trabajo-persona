@@ -7,11 +7,12 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { StatusService } from './status.service';
-import { CreateStatusDto } from './dto/create-status.dto';
+import { CreateStatusDto, FilterStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 
 @ApiTags('status')
@@ -25,8 +26,8 @@ export class StatusController {
   }
 
   @Get()
-  findAll() {
-    return this.statusService.findAll();
+  findAll(@Query() params: FilterStatusDto) {
+    return this.statusService.findAll(params);
   }
 
   @Get(':id')

@@ -49,7 +49,7 @@ export class CommercialPresentationsService {
   findAll(params?: FilterCommercialPresentationDto) {
     if (params) {
       const where: FindOptionsWhere<CommercialPresentation> = {};
-      const { limit, offset, medicineId } = params;
+      const { limit, offset, medicineId, sortBy, order } = params;
 
       if (medicineId) {
         where.medicine = { id: medicineId };
@@ -59,6 +59,7 @@ export class CommercialPresentationsService {
         where,
         take: limit,
         skip: offset,
+        order: { [sortBy]: order },
         relations: ['medicine', 'package', 'presentation'],
       });
     }

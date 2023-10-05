@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMedicinesActivePrincipleDto } from './dto/create-medicines-active-principle.dto';
+import {
+  CreateMedicinesActivePrincipleDto,
+  FilterMedicinesActiveDto,
+} from './dto/create-medicines-active-principle.dto';
 import { UpdateMedicinesActivePrincipleDto } from './dto/update-medicines-active-principle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { MedicinesActivePrinciple } from './entities/medicines-active-principle.entity';
 import { ActivePrinciplesService } from '../active-principles/active-principles.service';
 import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
@@ -40,10 +43,20 @@ export class MedicinesActivePrinciplesService {
     return this.medicinesActivePrincipleRepo.save(medicinesActivePrinciple);
   }
 
-  findAll() {
-    return this.medicinesActivePrincipleRepo.find({
-      relations: ['activePrinciple', 'medicine'],
-    });
+  findAll(params?: FilterMedicinesActiveDto) {
+    if (params) {
+      const where: FindOptionsWhere<MedicinesActivePrinciple> = {};
+      const { limit, offset, order, sortBy } = params;
+      return this.medicinesActivePrincipleRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+        relations: ['activePrinciple', 'medicine'],
+      });
+    }
+
+    return this.medicinesActivePrincipleRepo.find();
   }
 
   async findOne(id: number) {

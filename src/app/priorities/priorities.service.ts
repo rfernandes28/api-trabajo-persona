@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-import { CreatePriorityDto } from './dto/create-priority.dto';
+import {
+  CreatePriorityDto,
+  FilterPriorityDto,
+} from './dto/create-priority.dto';
 import { UpdatePriorityDto } from './dto/update-priority.dto';
 import { Priority } from './entities/priority.entity';
 
@@ -18,7 +21,19 @@ export class PrioritiesService {
     return this.priorityRepo.save(newPriority);
   }
 
-  findAll() {
+  findAll(params?: FilterPriorityDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+      const where: FindOptionsWhere<Priority> = {};
+
+      return this.priorityRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
+
     return this.priorityRepo.find();
   }
 

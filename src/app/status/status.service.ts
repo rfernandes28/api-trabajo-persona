@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-import { CreateStatusDto } from './dto/create-status.dto';
+import { CreateStatusDto, FilterStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { Status } from './entities/status.entity';
 
@@ -18,7 +18,18 @@ export class StatusService {
     return this.statusRepo.save(newStatus);
   }
 
-  findAll() {
+  findAll(params?: FilterStatusDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+      const where: FindOptionsWhere<Status> = {};
+
+      return this.statusRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
     return this.statusRepo.find();
   }
 

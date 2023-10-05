@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { IsEnum, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { order } from 'src/common/constants';
 
 export class CreateUserDto {
   @IsOptional()
@@ -48,4 +49,15 @@ export class FilterUserDto {
   @IsOptional()
   @ApiProperty()
   readonly offset?: number;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ default: 'id' })
+  readonly sortBy?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(order)
+  @ApiProperty({ default: order.asc })
+  readonly order?: order;
 }

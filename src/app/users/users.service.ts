@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, FilterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -15,7 +15,19 @@ export class UsersService {
     return await this.userRepo.save(newUser);
   }
 
-  findAll() {
+  findAll(params?: FilterUserDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+
+      const where: FindOptionsWhere<User> = {};
+
+      return this.userRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
     return this.userRepo.find();
   }
 

@@ -45,7 +45,7 @@ export class EntranceOfMedicinesService {
   findAll(params?: FilterEntranceOfMedicineDto) {
     if (params) {
       const where: FindOptionsWhere<EntranceOfMedicine> = {};
-      const { limit, offset, commercialPresentationId } = params;
+      const { limit, offset, commercialPresentationId, sortBy, order } = params;
 
       if (commercialPresentationId) {
         where.commercialPresentation = { id: commercialPresentationId };
@@ -55,6 +55,7 @@ export class EntranceOfMedicinesService {
         where,
         take: limit,
         skip: offset,
+        order: { [sortBy]: order },
         relations: ['commercialPresentation'],
       });
     }

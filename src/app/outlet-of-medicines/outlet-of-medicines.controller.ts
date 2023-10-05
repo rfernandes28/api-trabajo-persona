@@ -7,9 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { OutletOfMedicinesService } from './outlet-of-medicines.service';
-import { CreateOutletOfMedicineDto } from './dto/create-outlet-of-medicine.dto';
+import {
+  CreateOutletOfMedicineDto,
+  FilterOutletOfMedicineDto,
+} from './dto/create-outlet-of-medicine.dto';
 import { UpdateOutletOfMedicineDto } from './dto/update-outlet-of-medicine.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -26,8 +30,8 @@ export class OutletOfMedicinesController {
   }
 
   @Get()
-  findAll() {
-    return this.outletOfMedicinesService.findAll();
+  findAll(@Query() params: FilterOutletOfMedicineDto) {
+    return this.outletOfMedicinesService.findAll(params);
   }
 
   @Get(':id')

@@ -7,9 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { MedicinesActivePrinciplesService } from './medicines-active-principles.service';
-import { CreateMedicinesActivePrincipleDto } from './dto/create-medicines-active-principle.dto';
+import {
+  CreateMedicinesActivePrincipleDto,
+  FilterMedicinesActiveDto,
+} from './dto/create-medicines-active-principle.dto';
 import { UpdateMedicinesActivePrincipleDto } from './dto/update-medicines-active-principle.dto';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -31,8 +35,8 @@ export class MedicinesActivePrinciplesController {
   }
 
   @Get()
-  findAll() {
-    return this.medicinesActivePrinciplesService.findAll();
+  findAll(@Query() params: FilterMedicinesActiveDto) {
+    return this.medicinesActivePrinciplesService.findAll(params);
   }
 
   @Get(':id')

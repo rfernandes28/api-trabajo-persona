@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPositive,
   IsString,
   Min,
 } from 'class-validator';
+import { order } from 'src/common/constants';
 
 export class CreatePatientDto {
   @IsNotEmpty()
@@ -44,4 +46,15 @@ export class FilterPatientDto {
   @IsOptional()
   @ApiProperty()
   readonly offset?: number;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ default: 'id' })
+  readonly sortBy?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsEnum(order)
+  @ApiProperty({ default: order.asc })
+  readonly order?: order;
 }

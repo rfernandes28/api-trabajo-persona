@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOutletOfMedicineDto } from './dto/create-outlet-of-medicine.dto';
+import {
+  CreateOutletOfMedicineDto,
+  FilterOutletOfMedicineDto,
+} from './dto/create-outlet-of-medicine.dto';
 import { UpdateOutletOfMedicineDto } from './dto/update-outlet-of-medicine.dto';
 import { OutletOfMedicine } from './entities/outlet-of-medicine.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { MedicinesService } from '../medicines/medicines.service';
 
 @Injectable()
@@ -26,7 +29,19 @@ export class OutletOfMedicinesService {
     return this.outletOfMedicineRepo.save(newOutletOfMedicine);
   }
 
-  findAll() {
+  findAll(params?: FilterOutletOfMedicineDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+      const where: FindOptionsWhere<OutletOfMedicine> = {};
+
+      return this.outletOfMedicineRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
+
     return this.outletOfMedicineRepo.find();
   }
 

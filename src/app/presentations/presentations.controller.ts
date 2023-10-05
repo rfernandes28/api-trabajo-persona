@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { PresentationsService } from './presentations.service';
-import { CreatePresentationDto } from './dto/create-presentation.dto';
+import {
+  CreatePresentationDto,
+  FilterPresentationDto,
+} from './dto/create-presentation.dto';
 import { UpdatePresentationDto } from './dto/update-presentation.dto';
 
 @ApiTags('presentations')
@@ -25,8 +29,8 @@ export class PresentationsController {
   }
 
   @Get()
-  findAll() {
-    return this.presentationsService.findAll();
+  findAll(@Query() params: FilterPresentationDto) {
+    return this.presentationsService.findAll(params);
   }
 
   @Get(':id')

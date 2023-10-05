@@ -26,13 +26,14 @@ export class ActivePrinciplesService {
 
   findAll(params?: FilterActivePrinciplesDto) {
     if (params) {
+      const { limit, offset, order, sortBy } = params;
       const where: FindOptionsWhere<ActivePrinciple> = {};
-      const { limit, offset } = params;
 
       return this.activePrincipleRepo.find({
         where,
         take: limit,
         skip: offset,
+        order: { [sortBy]: order },
       });
     }
 

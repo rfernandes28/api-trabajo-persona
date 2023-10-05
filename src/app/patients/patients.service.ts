@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-import { CreatePatientDto } from './dto/create-patient.dto';
+import { CreatePatientDto, FilterPatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Patient } from './entities/patient.entity';
 
@@ -18,7 +18,18 @@ export class PatientsService {
     return await this.patientRepo.save(newPatient);
   }
 
-  findAll() {
+  findAll(params?: FilterPatientDto) {
+    if (params) {
+      const where: FindOptionsWhere<Patient> = {};
+      const { limit, offset, order, sortBy } = params;
+
+      return this.patientRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
     return this.patientRepo.find();
   }
 

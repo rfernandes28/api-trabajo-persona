@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { PrioritiesService } from './priorities.service';
-import { CreatePriorityDto } from './dto/create-priority.dto';
+import {
+  CreatePriorityDto,
+  FilterPriorityDto,
+} from './dto/create-priority.dto';
 import { UpdatePriorityDto } from './dto/update-priority.dto';
 
 @ApiTags('priorities')
@@ -25,8 +29,8 @@ export class PrioritiesController {
   }
 
   @Get()
-  findAll() {
-    return this.prioritiesService.findAll();
+  findAll(@Query() params: FilterPriorityDto) {
+    return this.prioritiesService.findAll(params);
   }
 
   @Get(':id')

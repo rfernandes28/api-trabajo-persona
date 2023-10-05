@@ -24,12 +24,13 @@ export class MedicinesService {
   findAll(params?: FilterMedicineDto) {
     if (params) {
       const where: FindOptionsWhere<Medicine> = {};
-      const { limit, offset } = params;
+      const { limit, offset, sortBy, order } = params;
 
       return this.medicineRepo.find({
         where,
         take: limit,
         skip: offset,
+        order: { [sortBy]: order },
       });
     }
 

@@ -7,10 +7,11 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PackagesService } from './packages.service';
-import { CreatePackageDto } from './dto/create-package.dto';
+import { CreatePackageDto, FilterPackageDto } from './dto/create-package.dto';
 import { UpdatePackageDto } from './dto/update-package.dto';
 
 @ApiTags('packages')
@@ -24,8 +25,8 @@ export class PackagesController {
   }
 
   @Get()
-  findAll() {
-    return this.packagesService.findAll();
+  findAll(@Query() params: FilterPackageDto) {
+    return this.packagesService.findAll(params);
   }
 
   @Get(':id')

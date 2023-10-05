@@ -19,6 +19,7 @@ import { OutletOfMedicinesModule } from '../app/outlet-of-medicines/outlet-of-me
 import { EntranceOfMedicinesModule } from '../app/entrance-of-medicines/entrance-of-medicines.module';
 import { MedicinesActivePrinciplesModule } from '../app/medicines-active-principles/medicines-active-principles.module';
 import { CommercialPresentationsModule } from '../app/commercial-presentations/commercial-presentations.module';
+import { UsersModule } from 'src/app/users/users.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { CommercialPresentationsModule } from '../app/commercial-presentations/c
     PatientsModule,
     OutletOfMedicinesModule,
     CommercialPresentationsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

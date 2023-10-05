@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePackageDto } from './dto/create-package.dto';
+import { CreatePackageDto, FilterPackageDto } from './dto/create-package.dto';
 import { UpdatePackageDto } from './dto/update-package.dto';
 import { Package } from './entities/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class PackagesService {
@@ -18,7 +18,18 @@ export class PackagesService {
     return this.packageRepo.save(newPackage);
   }
 
-  findAll() {
+  findAll(params?: FilterPackageDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+      const where: FindOptionsWhere<Package> = {};
+
+      return this.packageRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
     return this.packageRepo.find();
   }
 

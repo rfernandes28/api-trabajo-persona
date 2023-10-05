@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-import { CreatePresentationDto } from './dto/create-presentation.dto';
+import {
+  CreatePresentationDto,
+  FilterPresentationDto,
+} from './dto/create-presentation.dto';
 import { UpdatePresentationDto } from './dto/update-presentation.dto';
 import { Presentation } from './entities/presentation.entity';
 
@@ -19,7 +22,19 @@ export class PresentationsService {
     return this.presentationRepo.save(newPresentation);
   }
 
-  findAll() {
+  findAll(params?: FilterPresentationDto) {
+    if (params) {
+      const { limit, offset, order, sortBy } = params;
+
+      const where: FindOptionsWhere<Presentation> = {};
+
+      return this.presentationRepo.find({
+        where,
+        take: limit,
+        skip: offset,
+        order: { [sortBy]: order },
+      });
+    }
     return this.presentationRepo.find();
   }
 
