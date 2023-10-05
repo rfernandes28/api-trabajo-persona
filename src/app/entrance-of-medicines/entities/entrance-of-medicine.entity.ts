@@ -1,16 +1,12 @@
-import { getDataSourceName } from '@nestjs/typeorm';
 import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 import {
-  AfterInsert,
   Column,
   CreateDateColumn,
-  DataSource,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  getManager,
 } from 'typeorm';
 
 @Entity({ name: 'entrance_of_medicines' })
@@ -24,7 +20,7 @@ export class EntranceOfMedicine {
   @Column({ type: 'int', name: 'boxes_quantity', nullable: true })
   boxesQuantity: number;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'timestamptz', nullable: true })
   expiration: Date;
 
   @Column({ type: 'boolean', default: false })
@@ -53,15 +49,4 @@ export class EntranceOfMedicine {
     default: () => 'CURRENT_TIMESTAMP',
   })
   updateAt: Date;
-
-  // @AfterInsert()
-  // async resetCounters() {
-  //   console.log('AfterInsert>>');
-
-  //     getRepository(CommercialPresentation)
-  //     .createQueryBuilder()
-  //     .update(CommercialPresentation)
-  //     .set({ stock: () => 'stock + :unitQuantity' })
-  //     .setParameters({ unitQuantity: this.unitQuantity });
-  // }
 }

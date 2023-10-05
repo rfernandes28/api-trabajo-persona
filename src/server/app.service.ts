@@ -100,7 +100,7 @@ export class AppService {
           let presentation = presentationColArray[index];
           let concentration = concentrationColArray[index];
 
-          const boxesQuantity = boxesQuantityColArray[index];
+          let boxesQuantity = boxesQuantityColArray[index];
           let unitQuantity = unitQuantityColArray[index];
           const expiration = expirationColArray[index];
           const expire = expireyColArray[index];
@@ -170,6 +170,10 @@ export class AppService {
               if (typeof unitQuantity === 'object') {
                 unitQuantity = unitQuantity.result ? unitQuantity.result : 0;
               }
+
+              if (typeof boxesQuantity === 'object') {
+                boxesQuantity = boxesQuantity.result ? boxesQuantity.result : 0;
+              }
               concentration = concentration
                 ? concentration
                     .toUpperCase()
@@ -185,7 +189,7 @@ export class AppService {
                   ? activePrinciple.trim()
                   : 'S/I',
                 boxesQuantity: boxesQuantity ? boxesQuantity : 0,
-                unitQuantity: unitQuantity,
+                unitQuantity: unitQuantity ? unitQuantity : 0,
                 expiration,
                 packageData: packageData.toUpperCase(),
                 presentation: presentation.toUpperCase(),
@@ -389,7 +393,7 @@ export class AppService {
   async registerEntranceOfMedicines(medicines: any) {
     try {
       return Promise.all(
-        medicines.map(async (data) => {
+        medicines.map(async (data: any) => {
           const {
             medicine,
             concentration,

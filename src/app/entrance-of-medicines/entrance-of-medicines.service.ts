@@ -8,6 +8,7 @@ import {
 import { UpdateEntranceOfMedicineDto } from './dto/update-entrance-of-medicine.dto';
 import { EntranceOfMedicine } from './entities/entrance-of-medicine.entity';
 import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
+import { validarFormatoFecha } from 'src/common/utils';
 
 @Injectable()
 export class EntranceOfMedicinesService {
@@ -18,28 +19,35 @@ export class EntranceOfMedicinesService {
   ) {}
 
   async create(createEntranceOfMedicineDto: CreateEntranceOfMedicineDto) {
-    const {
-      commercialPresentationId,
-      unitQuantity,
-      boxesQuantity,
-      expiration,
-      expire,
-      donor,
-    } = createEntranceOfMedicineDto;
-    const commercialPresentation =
-      await this.commercialPresentationsService.findOne(
+    try {
+      const {
         commercialPresentationId,
-      );
-    const newEntranceOfMedicine = new EntranceOfMedicine();
+        unitQuantity,
+        boxesQuantity,
+        expiration,
+        expire,
+        donor,
+      } = createEntranceOfMedicineDto;
 
-    newEntranceOfMedicine.commercialPresentation = commercialPresentation;
-    newEntranceOfMedicine.unitQuantity = unitQuantity;
-    newEntranceOfMedicine.boxesQuantity = boxesQuantity;
-    newEntranceOfMedicine.expiration = expiration;
-    newEntranceOfMedicine.expire = expire;
-    newEntranceOfMedicine.donor = donor;
+      const commercialPresentation =
+        await this.commercialPresentationsService.findOne(
+          commercialPresentationId,
+        );
+      const newEntranceOfMedicine = new EntranceOfMedicine();
 
-    return this.entranceOfMedicineRepo.save(newEntranceOfMedicine);
+      newEntranceOfMedicine.commercialPresentation = commercialPresentation;
+      newEntranceOfMedicine.unitQuantity = unitQuantity;
+      newEntranceOfMedicine.boxesQuantity = boxesQuantity;
+      newEntranceOfMedicine.expiration = validarFormatoFecha(expiration)
+        ? expiration
+        : null;
+      newEntranceOfMedicine.expire = expire;
+      newEntranceOfMedicine.donor = donor;
+
+      return await this.entranceOfMedicineRepo.save(newEntranceOfMedicine);
+    } catch (error) {
+      return error;
+    }
   }
 
   findAll(params?: FilterEntranceOfMedicineDto) {

@@ -52,7 +52,7 @@ export class MedicinesActivePrinciplesService {
         take: limit,
         skip: offset,
         order: { [sortBy]: order },
-        relations: ['activePrinciple', 'medicine'],
+        relations: ['activePrinciple', 'commercialPresentation'],
       });
     }
 
