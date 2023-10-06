@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import {
   CreateMedicineDto,
@@ -23,8 +23,13 @@ export class MedicinesService {
 
   findAll(params?: FilterMedicineDto) {
     if (params) {
+      const { limit, offset, sortBy, order, search } = params;
+
       const where: FindOptionsWhere<Medicine> = {};
-      const { limit, offset, sortBy, order } = params;
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.medicineRepo.find({
         where,

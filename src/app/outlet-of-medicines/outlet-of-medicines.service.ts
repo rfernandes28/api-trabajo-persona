@@ -6,7 +6,7 @@ import {
 import { UpdateOutletOfMedicineDto } from './dto/update-outlet-of-medicine.dto';
 import { OutletOfMedicine } from './entities/outlet-of-medicine.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { MedicinesService } from '../medicines/medicines.service';
 
 @Injectable()
@@ -31,8 +31,12 @@ export class OutletOfMedicinesService {
 
   findAll(params?: FilterOutletOfMedicineDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
       const where: FindOptionsWhere<OutletOfMedicine> = {};
+
+      if (search) {
+        where.commercialPresentation = { name: ILike(`%${search}%`) };
+      }
 
       return this.outletOfMedicineRepo.find({
         where,

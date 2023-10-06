@@ -1,3 +1,4 @@
+import { CommercialPresentation } from 'src/app/commercial-presentations/entities/commercial-presentation.entity';
 import { Medicine } from '../../medicines/entities/medicine.entity';
 import {
   Column,
@@ -23,6 +24,13 @@ export class OutletOfMedicine {
     referencedColumnName: 'id',
   })
   medicine: Medicine;
+
+  @ManyToOne(() => CommercialPresentation)
+  @JoinColumn({
+    name: 'commercial_presentation_id',
+    referencedColumnName: 'id',
+  })
+  commercialPresentation: CommercialPresentation;
 
   @CreateDateColumn({
     name: 'create_at',

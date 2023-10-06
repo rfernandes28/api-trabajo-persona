@@ -5,7 +5,7 @@ import {
 } from './dto/create-medicines-active-principle.dto';
 import { UpdateMedicinesActivePrincipleDto } from './dto/update-medicines-active-principle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { MedicinesActivePrinciple } from './entities/medicines-active-principle.entity';
 import { ActivePrinciplesService } from '../active-principles/active-principles.service';
 import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
@@ -46,7 +46,11 @@ export class MedicinesActivePrinciplesService {
   findAll(params?: FilterMedicinesActiveDto) {
     if (params) {
       const where: FindOptionsWhere<MedicinesActivePrinciple> = {};
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
+
+      if (search) {
+        where.commercialPresentation = { name: ILike(`%${search}%`) };
+      }
       return this.medicinesActivePrincipleRepo.find({
         where,
         take: limit,

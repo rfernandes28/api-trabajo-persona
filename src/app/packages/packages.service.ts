@@ -3,7 +3,7 @@ import { CreatePackageDto, FilterPackageDto } from './dto/create-package.dto';
 import { UpdatePackageDto } from './dto/update-package.dto';
 import { Package } from './entities/package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class PackagesService {
@@ -20,8 +20,12 @@ export class PackagesService {
 
   findAll(params?: FilterPackageDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
       const where: FindOptionsWhere<Package> = {};
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.packageRepo.find({
         where,

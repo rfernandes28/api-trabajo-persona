@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import {
   CreatePresentationDto,
@@ -24,9 +24,13 @@ export class PresentationsService {
 
   findAll(params?: FilterPresentationDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
 
       const where: FindOptionsWhere<Presentation> = {};
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.presentationRepo.find({
         where,

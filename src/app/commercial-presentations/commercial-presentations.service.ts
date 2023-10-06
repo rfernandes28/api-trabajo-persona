@@ -5,7 +5,7 @@ import {
 } from './dto/create-commercial-presentation.dto';
 import { UpdateCommercialPresentationDto } from './dto/update-commercial-presentation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CommercialPresentation } from './entities/commercial-presentation.entity';
 import { MedicinesService } from '../medicines/medicines.service';
 import { PackagesService } from '../packages/packages.service';
@@ -49,10 +49,14 @@ export class CommercialPresentationsService {
   findAll(params?: FilterCommercialPresentationDto) {
     if (params) {
       const where: FindOptionsWhere<CommercialPresentation> = {};
-      const { limit, offset, medicineId, sortBy, order } = params;
+      const { limit, offset, medicineId, sortBy, order, search } = params;
 
       if (medicineId) {
         where.medicine = { id: medicineId };
+      }
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
       }
 
       return this.commercialPresentationRepo.find({

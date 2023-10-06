@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import { CreateStatusDto, FilterStatusDto } from './dto/create-status.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -20,8 +20,12 @@ export class StatusService {
 
   findAll(params?: FilterStatusDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
       const where: FindOptionsWhere<Status> = {};
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.statusRepo.find({
         where,

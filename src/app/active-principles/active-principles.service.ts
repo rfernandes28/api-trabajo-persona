@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import { ActivePrinciple } from './entities/active-principle.entity';
 import {
@@ -26,8 +26,12 @@ export class ActivePrinciplesService {
 
   findAll(params?: FilterActivePrinciplesDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
       const where: FindOptionsWhere<ActivePrinciple> = {};
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.activePrincipleRepo.find({
         where,

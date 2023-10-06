@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import {
   CreatePriorityDto,
@@ -23,8 +23,12 @@ export class PrioritiesService {
 
   findAll(params?: FilterPriorityDto) {
     if (params) {
-      const { limit, offset, order, sortBy } = params;
+      const { limit, offset, order, sortBy, search } = params;
       const where: FindOptionsWhere<Priority> = {};
+
+      if (search) {
+        where.name = ILike(`%${search}%`);
+      }
 
       return this.priorityRepo.find({
         where,

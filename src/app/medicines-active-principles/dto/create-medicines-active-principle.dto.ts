@@ -46,4 +46,9 @@ export class FilterMedicinesActiveDto {
   @IsEnum(order)
   @ApiProperty({ default: order.asc })
   readonly order?: order;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty()
+  public search?: string;
 }
