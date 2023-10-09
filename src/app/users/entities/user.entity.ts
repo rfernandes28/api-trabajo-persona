@@ -6,6 +6,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum UserType {
+  ADMIN = 1,
+  REGULAR = 2,
+}
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -34,8 +38,13 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   password: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  role: string;
+  @Column({
+    type: 'varchar',
+    length: 255,
+    enum: UserType,
+    default: UserType.REGULAR,
+  })
+  role: UserType;
 
   @CreateDateColumn({
     name: 'create_at',

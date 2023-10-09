@@ -9,6 +9,7 @@ import { UpdateEntranceOfMedicineDto } from './dto/update-entrance-of-medicine.d
 import { EntranceOfMedicine } from './entities/entrance-of-medicine.entity';
 import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
 import { validarFormatoFecha } from 'src/common/utils';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class EntranceOfMedicinesService {
@@ -16,6 +17,7 @@ export class EntranceOfMedicinesService {
     @InjectRepository(EntranceOfMedicine)
     private entranceOfMedicineRepo: Repository<EntranceOfMedicine>,
     private commercialPresentationsService: CommercialPresentationsService,
+    private usersService: UsersService,
   ) {}
 
   async create(createEntranceOfMedicineDto: CreateEntranceOfMedicineDto) {
@@ -27,12 +29,16 @@ export class EntranceOfMedicinesService {
         expiration,
         expire,
         donor,
+        userId,
       } = createEntranceOfMedicineDto;
 
       const commercialPresentation =
         await this.commercialPresentationsService.findOne(
           commercialPresentationId,
         );
+
+      const user = await this.usersService.findOne(userId);
+
       const newEntranceOfMedicine = new EntranceOfMedicine();
 
       newEntranceOfMedicine.commercialPresentation = commercialPresentation;
@@ -43,6 +49,7 @@ export class EntranceOfMedicinesService {
         : null;
       newEntranceOfMedicine.expire = expire;
       newEntranceOfMedicine.donor = donor;
+      newEntranceOfMedicine.user = user;
 
       return await this.entranceOfMedicineRepo.save(newEntranceOfMedicine);
     } catch (error) {
@@ -69,7 +76,7 @@ export class EntranceOfMedicinesService {
         take: limit,
         skip: offset,
         order: { [sortBy]: order },
-        relations: ['commercialPresentation'],
+        relations: ['commercialPresentation', 'user'],
       });
     }
 
@@ -79,7 +86,7 @@ export class EntranceOfMedicinesService {
   async findOne(id: number) {
     const entranceOfMedicine = await this.entranceOfMedicineRepo.findOne({
       where: { id },
-      relations: ['commercialPresentation'],
+      relations: ['commercialPresentation', 'user'],
     });
     if (!entranceOfMedicine) {
       throw new NotFoundException(`EntranceOfMedicine #${id} not found`);

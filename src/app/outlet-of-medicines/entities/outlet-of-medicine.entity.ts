@@ -1,4 +1,4 @@
-import { CommercialPresentation } from 'src/app/commercial-presentations/entities/commercial-presentation.entity';
+import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 import { Medicine } from '../../medicines/entities/medicine.entity';
 import {
   Column,

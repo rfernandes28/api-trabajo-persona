@@ -1,3 +1,4 @@
+import { User } from '../../users/entities/user.entity';
 import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
 import {
   Column,
@@ -35,6 +36,13 @@ export class EntranceOfMedicine {
     referencedColumnName: 'id',
   })
   commercialPresentation: CommercialPresentation;
+
+  @ManyToOne(() => User)
+  @JoinColumn({
+    name: 'user_id',
+    referencedColumnName: 'id',
+  })
+  user: User;
 
   @CreateDateColumn({
     name: 'create_at',

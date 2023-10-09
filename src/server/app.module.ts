@@ -19,7 +19,7 @@ import { OutletOfMedicinesModule } from '../app/outlet-of-medicines/outlet-of-me
 import { EntranceOfMedicinesModule } from '../app/entrance-of-medicines/entrance-of-medicines.module';
 import { MedicinesActivePrinciplesModule } from '../app/medicines-active-principles/medicines-active-principles.module';
 import { CommercialPresentationsModule } from '../app/commercial-presentations/commercial-presentations.module';
-import { UsersModule } from 'src/app/users/users.module';
+import { UsersModule } from '../app/users/users.module';
 
 @Module({
   imports: [

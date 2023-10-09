@@ -20,6 +20,8 @@ import { CommercialPresentationsService } from '../app/commercial-presentations/
 import { CreateCommercialPresentationDto } from '../app/commercial-presentations/dto/create-commercial-presentation.dto';
 import { EntranceOfMedicinesService } from '../app/entrance-of-medicines/entrance-of-medicines.service';
 import { CreateEntranceOfMedicineDto } from '../app/entrance-of-medicines/dto/create-entrance-of-medicine.dto';
+import { CreateUserDto } from '../app/users/dto/create-user.dto';
+import { UsersService } from '../app/users/users.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Excel = require('exceljs');
@@ -42,6 +44,7 @@ export class AppService {
     private medicinesService: MedicinesService,
     private commercialPresentationsService: CommercialPresentationsService,
     private packagesService: PackagesService,
+    private usersService: UsersService,
     private presentationsService: PresentationsService,
     private entranceOfMedicinesService: EntranceOfMedicinesService,
     private medicinesActivePrinciplesService: MedicinesActivePrinciplesService,
@@ -80,7 +83,11 @@ export class AppService {
 
       const donorColArray = worksheet.getColumn(13).values;
 
+      const userColArray = worksheet.getColumn(14).values;
+
       const newMedicine: any = [];
+
+      const newUser: any = [];
 
       const newActivePrinciples: any = [];
 
@@ -95,13 +102,14 @@ export class AppService {
       activePrincipleColArray.map(
         async (activePrinciple: any, index: number) => {
           let medicine = medicineColArray[index];
+          let user = userColArray[index];
           let location = locationColArray[index];
           let packageData = packageColArray[index];
           let presentation = presentationColArray[index];
           let concentration = concentrationColArray[index];
-
           let boxesQuantity = boxesQuantityColArray[index];
           let unitQuantity = unitQuantityColArray[index];
+
           const expiration = expirationColArray[index];
           const expire = expireyColArray[index];
           const donor = donorColArray[index];
@@ -112,6 +120,17 @@ export class AppService {
               medicine = nameArray[0].text;
             }
             medicine = medicine ? medicine.trim() : 's/i';
+
+            if (typeof user === 'object') {
+              const userArray = user.richText;
+              user = userArray[0].text;
+            }
+
+            user = user ? user.trim() : null;
+
+            if (user) {
+              newUser.push({ name: user.toUpperCase() });
+            }
 
             if (typeof location === 'object') {
               const nameArray = location.richText;
@@ -195,6 +214,7 @@ export class AppService {
                 presentation: presentation.toUpperCase(),
                 expire: expire.result === 'EXPIRO' ? true : false,
                 donor,
+                user,
               });
             }
           }
@@ -205,6 +225,8 @@ export class AppService {
         Logger.verbose('Accion de cargar');
 
         const uniqueMedicineArray = this.removeDuplicates(newMedicine, 'name');
+
+        const uniqueUserArray = this.removeDuplicates(newUser, 'name');
 
         const uniqueActivePrinciplesArray = this.removeDuplicates(
           newActivePrinciples,
@@ -220,6 +242,7 @@ export class AppService {
 
         return Promise.all([
           await this.registerMedicine(uniqueMedicineArray),
+          await this.registerUser(uniqueUserArray),
           await this.registerActivePrinciple(uniqueActivePrinciplesArray),
           await this.registerPackage(uniquePackageArray),
           await this.registerPresentation(uniquePresentationArray),
@@ -302,7 +325,7 @@ export class AppService {
             ? concentrationData[index].trim()
             : 'S/I',
         };
-        console.log('newData', newData);
+
         arrayData.push(newData);
       };
 
@@ -325,8 +348,6 @@ export class AppService {
       }
 
       if (newMedicine.length - 1 === index) {
-        console.log('ultimo \n');
-
         arrayData = arrayData.sort(
           (a: { medicineId: number }, b: { medicineId: number }) =>
             b.medicineId - a.medicineId,
@@ -352,8 +373,6 @@ export class AppService {
         packageId: value.packageId,
         presentationId: value.presentationId,
       };
-
-      console.log('dataCommercial>>', dataCommercial);
 
       await this.commercialPresentationsService.create(dataCommercial);
     }
@@ -393,7 +412,7 @@ export class AppService {
   async registerEntranceOfMedicines(medicines: any) {
     try {
       return Promise.all(
-        medicines.map(async (data: any) => {
+        await medicines.map(async (data: any) => {
           const {
             medicine,
             concentration,
@@ -404,6 +423,7 @@ export class AppService {
             donor,
             packageData,
             presentation,
+            user,
           } = data;
 
           const medicineFound = await this.medicinesService.findByName(
@@ -422,6 +442,8 @@ export class AppService {
               commercialPresentation.package.name === packageData,
           )[0];
 
+          const userFound = await this.usersService.findByName(user);
+
           if (commercialPresentationFound) {
             const dataEntranceOfMedicines: CreateEntranceOfMedicineDto = {
               commercialPresentationId: commercialPresentationFound.id,
@@ -430,6 +452,7 @@ export class AppService {
               expiration,
               expire,
               donor,
+              userId: userFound ? userFound.id : null,
             };
 
             return await this.entranceOfMedicinesService.create(
@@ -458,6 +481,28 @@ export class AppService {
             };
 
             return await this.medicinesService.create(data);
+          }
+        }),
+      );
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async registerUser(users: any) {
+    try {
+      return Promise.all(
+        users.map(async (user: { name: string }) => {
+          const { name } = user;
+
+          const userFound = await this.usersService.findAll({ search: name });
+
+          if (userFound.length === 0) {
+            const data: CreateUserDto = {
+              name,
+            };
+
+            return await this.usersService.create(data);
           }
         }),
       );
