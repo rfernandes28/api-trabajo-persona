@@ -17,9 +17,21 @@ export enum Action {
 
 export enum SheetPatient {
   CCS_0322 = 'CCS 0322',
+  TOC_HUM_DUA_0322 = 'TOC HUM DUA 0322',
+  VALERA = 'VALERA',
+  MERIDA = 'MERIDA',
 }
 
 export class LoadPatientDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    description: 'Seleccionar la hoja a cargar',
+  })
+  readonly sheet: SheetPatient;
+}
+
+export class LoadCommunityDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty({

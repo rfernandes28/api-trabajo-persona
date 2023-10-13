@@ -5,17 +5,46 @@ import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CreatePatientDto, FilterPatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { Patient } from './entities/patient.entity';
+import { CommunitiesService } from '../communities/communities.service';
 
 @Injectable()
 export class PatientsService {
   constructor(
     @InjectRepository(Patient) private patientRepo: Repository<Patient>,
+    private communitiesService: CommunitiesService,
   ) {}
 
   async create(createPatientDto: CreatePatientDto) {
-    const newPatient = this.patientRepo.create(createPatientDto);
+    try {
+      const {
+        name,
+        lastName,
+        note,
+        communityId,
+        identificationNumber,
+        contactPerson,
+        code,
+      } = createPatientDto;
+      const newPatient = new Patient();
 
-    return await this.patientRepo.save(newPatient);
+      let community = null;
+
+      if (communityId) {
+        community = await this.communitiesService.findOne(communityId);
+      }
+
+      newPatient.identificationNumber = identificationNumber;
+      newPatient.name = name;
+      newPatient.lastName = lastName;
+      newPatient.code = code;
+      newPatient.note = note;
+      newPatient.contactPerson = contactPerson;
+      newPatient.community = community;
+
+      return await this.patientRepo.save(newPatient);
+    } catch (error) {
+      return error;
+    }
   }
 
   findAll(params?: FilterPatientDto) {

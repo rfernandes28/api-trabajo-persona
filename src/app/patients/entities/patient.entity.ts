@@ -1,7 +1,10 @@
+import { Community } from '../../communities/entities/community.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,6 +19,21 @@ export class Patient {
 
   @Column({ name: 'last_name', type: 'varchar', length: 255 })
   lastName: string;
+
+  @Column({
+    name: 'contact_person',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  contactPerson: string;
+
+  @ManyToOne(() => Community)
+  @JoinColumn({
+    name: 'community_id',
+    referencedColumnName: 'id',
+  })
+  community: Community;
 
   @Column({
     name: 'identification_number',

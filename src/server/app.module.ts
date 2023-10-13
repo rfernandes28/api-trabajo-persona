@@ -20,6 +20,7 @@ import { EntranceOfMedicinesModule } from '../app/entrance-of-medicines/entrance
 import { MedicinesActivePrinciplesModule } from '../app/medicines-active-principles/medicines-active-principles.module';
 import { CommercialPresentationsModule } from '../app/commercial-presentations/commercial-presentations.module';
 import { UsersModule } from '../app/users/users.module';
+import { CommunitiesModule } from '../app/communities/communities.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { UsersModule } from '../app/users/users.module';
     OutletOfMedicinesModule,
     CommercialPresentationsModule,
     UsersModule,
+    CommunitiesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

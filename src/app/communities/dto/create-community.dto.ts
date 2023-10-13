@@ -1,53 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEnum,
   IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsPositive,
   IsString,
+  IsPositive,
+  IsOptional,
   Min,
+  IsEnum,
 } from 'class-validator';
 import { order } from 'src/common/constants';
 
-export class CreatePatientDto {
+export class CreateCommunityDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
   readonly name: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty()
-  readonly lastName: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
-  readonly contactPerson: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
-  readonly identificationNumber: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty()
-  readonly code: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty()
-  readonly note: string;
-
-  @IsOptional()
-  @IsNumber()
-  @ApiProperty()
-  readonly communityId: number;
 }
 
-export class FilterPatientDto {
+export class FilterCommunityDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty()

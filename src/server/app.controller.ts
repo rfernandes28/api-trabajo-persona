@@ -11,12 +11,40 @@ import { AppService } from './app.service';
 import { ApiConsumes, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiFile } from '../decorators/apiFile.decorator';
-import { LoadPatientDto, loadMedicineDto } from './dto/load.dto';
+import {
+  LoadCommunityDto,
+  LoadPatientDto,
+  loadMedicineDto,
+} from './dto/load.dto';
 
 @ApiTags('master')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @Post('load-communities')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Carga de comunidades',
+    description:
+      'Este metodo se ejecutara con el excel "tratamientos" sobre la pestaña "CSS 0323" unicamente',
+  })
+  @ApiFile('file')
+  @UseInterceptors(FileInterceptor('file'))
+  loadCommunities(
+    @UploadedFile() file: Express.Multer.File,
+    @Query() loadDto: LoadCommunityDto,
+  ) {
+    if (!file)
+      throw new InternalServerErrorException('No se ha encontrado el archivo');
+    const { sheet } = loadDto;
+    Logger.log(
+      `loadCommunities> fileName: ${file.originalname} sheet: ${sheet}`,
+      AppController.name,
+    );
+
+    this.appService.loadCommunities(file, sheet);
+  }
 
   @Post('load-patients')
   @ApiConsumes('multipart/form-data')

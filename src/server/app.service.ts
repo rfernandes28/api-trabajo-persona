@@ -22,6 +22,8 @@ import { EntranceOfMedicinesService } from '../app/entrance-of-medicines/entranc
 import { CreateEntranceOfMedicineDto } from '../app/entrance-of-medicines/dto/create-entrance-of-medicine.dto';
 import { CreateUserDto } from '../app/users/dto/create-user.dto';
 import { UsersService } from '../app/users/users.service';
+import { CommunitiesService } from '../app/communities/communities.service';
+import { CreateCommunityDto } from 'src/app/communities/dto/create-community.dto';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Excel = require('exceljs');
@@ -45,6 +47,7 @@ export class AppService {
     private commercialPresentationsService: CommercialPresentationsService,
     private packagesService: PackagesService,
     private usersService: UsersService,
+    private communitiesService: CommunitiesService,
     private presentationsService: PresentationsService,
     private entranceOfMedicinesService: EntranceOfMedicinesService,
     private medicinesActivePrinciplesService: MedicinesActivePrinciplesService,
@@ -604,6 +607,31 @@ export class AppService {
     }
   }
 
+  async loadCommunities(data: Express.Multer.File, sheet: string) {
+    try {
+      const workbook = new Excel.Workbook();
+      await workbook.xlsx.load(data.buffer);
+
+      const worksheet = workbook.getWorksheet(sheet);
+      const communityColArray = worksheet.getColumn(5).values;
+
+      const newCommunities: any = [];
+      communityColArray.map(async (name: any, index: number) => {
+        if (index !== 1 && name !== 'COMUNIDAD') {
+          newCommunities.push({ name });
+        }
+      });
+
+      const uniqueArray = this.removeDuplicates(newCommunities, 'name');
+
+      await this.registerCommunity(uniqueArray);
+    } catch (error: any) {
+      Logger.error(error, AppService.name);
+
+      throw new InternalServerErrorException();
+    }
+  }
+
   ////////////
 
   async loadPatients(data: Express.Multer.File, sheet: string) {
@@ -619,15 +647,24 @@ export class AppService {
 
       const nameColArray = worksheet.getColumn(4).values;
 
+      const communityColArray = worksheet.getColumn(5).values;
+
+      const contactPersonArray = worksheet.getColumn(7).values;
+
       const identificationNumberColArray = worksheet.getColumn(42).values;
 
       const newPatients: any = [];
 
-      codeColArray.map(async (code: any, index: number) => {
+      for (let index = 0; index < codeColArray.length; index++) {
+        const code = codeColArray[index];
         let name = nameColArray[index];
         let note = '';
         const lastName = lastNameColArray[index];
         const identificationNumber = identificationNumberColArray[index];
+
+        const community = communityColArray[index];
+
+        let contactPerson = contactPersonArray[index];
 
         if (index !== 1) {
           if (typeof nameColArray[index] === 'object') {
@@ -646,6 +683,15 @@ export class AppService {
           name = nameSlit[0].trim();
           note = nameSlit.length === 2 ? nameSlit[1].replace(')', '') : note;
 
+          if (typeof contactPerson === 'object') {
+            const contactPersonArray = contactPerson.richText;
+            contactPerson = contactPersonArray[0].text;
+          }
+
+          const communityFound = await this.communitiesService.findByName(
+            community,
+          );
+
           newPatients.push({
             code,
             name,
@@ -654,9 +700,11 @@ export class AppService {
               ? identificationNumber.toString().replace(/[^0-9]+/g, '')
               : '',
             note,
+            communityId: communityFound ? communityFound.id : null,
+            contactPerson,
           });
         }
-      });
+      }
 
       const uniqueArray = this.removeDuplicates(newPatients, 'code');
 
@@ -668,6 +716,23 @@ export class AppService {
     }
   }
 
+  async registerCommunity(communities: any) {
+    Promise.all(
+      communities.map(async (community: { name: string }) => {
+        const { name } = community;
+        const communityFound = await this.communitiesService.findByName(name);
+
+        if (!communityFound) {
+          const data: CreateCommunityDto = {
+            name,
+          };
+
+          await this.communitiesService.create(data);
+        }
+      }),
+    );
+  }
+
   async registerPatient(patients: any) {
     Promise.all(
       patients.map(
@@ -677,8 +742,21 @@ export class AppService {
           lastName: string;
           identificationNumber: string;
           note: string;
+          communityId: number;
+          contactPerson: string;
         }) => {
-          const { code, name, lastName, identificationNumber, note } = patient;
+          console.log('patient', patient);
+
+          const {
+            code,
+            name,
+            lastName,
+            identificationNumber,
+            note,
+            communityId,
+            contactPerson,
+          } = patient;
+
           const patientFound = await this.patientsService.findByCode(code);
 
           if (!patientFound) {
@@ -688,6 +766,8 @@ export class AppService {
               code,
               identificationNumber,
               note,
+              communityId,
+              contactPerson,
             };
 
             await this.patientsService.create(data);
