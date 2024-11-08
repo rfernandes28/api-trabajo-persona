@@ -23,3 +23,108 @@ nest g resource app/medicines-active-principles
 
  @Column({ type: 'varchar', name: 'last_name', length: 255 })
   lastName: string;
+
+
+---CCS---
+A  CANT MENSUAL
+B	 #
+C  APELLIDO *
+D  NOMBRE
+E  COMUNIDAD
+F  PRIORIDAD
+G  PERSONA CONTACTO
+H  NOMBRE COMERCIAL
+I  PRINCIPIO ACTIVO
+J  PATOLOGÍA
+K  PRESENTACIÓN*
+L  CONCENTRACIÓN mg*
+M  INDICACIONES
+
+---TOC---
+A Cantidad Mensual
+B
+C Apellido
+D Nombre
+E COMUNIDAD
+F Prioridad
+G Persona Contacto / Parentesco
+H Nombre Comercial
+I Principio activo
+J Presentación
+K Concentración
+L Indicaciones
+
+---VALERA---
+A CANT MENSUAL
+B	#
+C APELLIDO *
+D NOMBRE
+E COMUNIDAD
+F PRIORIDAD
+G PERSONA CONTACTO
+H NOMBRE COMERCIAL
+I PRINCIPIO ACTIVO
+J PRESENTACIÓN*
+K CONCENTRACIÓN mg*
+L INDICACIONES*
+
+
+---MERIDA---
+A CANT MENSUAL
+B #
+C APELLIDO *
+D NOMBRE
+E COMUNIDAD
+F PRIORIDAD
+G PERSONA CONTACTO
+H NOMBRE COMERCIAL
+I PRINCIPIO ACTIVO
+J PRESENTACIÓN*
+K CONCENTRACIÓN mg*
+L INDICACIONES*
+
+
+
+---Archivo de tratamiento   CCS 0322---
+CANT MENSUAL
+#
+APELLIDO *
+NOMBRE
+COMUNIDAD
+PRIORIDAD
+PERSONA
+CONTACTO
+NOMBRE COMERCIAL
+PRINCIPIO ACTIVO
+PATOLOGÍA
+PRESENTACIÓN*
+CONCENTRACIÓN mg*
+INDICACIONES*
+ene-22
+feb-22
+mar-22
+abr-22
+may-22
+jun-22
+jul-22
+ago-22
+sep-22
+oct-22
+nov-22
+dic-22
+ene-23
+feb-23
+mar-23
+abr-23
+may-23
+jun-23
+jul-23
+ago-23
+sep-23
+may-23
+jun-23
+CONTACTO
+CORREO ELECTRÓNICO
+COMENTARIO
+Actualizacion
+CI

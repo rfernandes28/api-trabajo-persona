@@ -8,7 +8,7 @@ import { enviroments } from '../configuration/enviroments';
 import config from '../configuration/config';
 import { DatabaseModule } from '../configuration/database/database.module';
 import { PatientsModule } from '../app/patients/patients.module';
-import { PathologiesModule } from '../app/pathologies/pathologies.module';
+import { TreatmentsModule } from '../app/treatments/treatments.module';
 import { PresentationsModule } from '../app/presentations/presentations.module';
 import { MedicinesModule } from '../app/medicines/medicines.module';
 import { ActivePrinciplesModule } from '../app/active-principles/active-principles.module';
@@ -47,7 +47,7 @@ import { CommunitiesModule } from '../app/communities/communities.module';
     MedicinesModule,
     MedicinesActivePrinciplesModule,
     PackagesModule,
-    PathologiesModule,
+    TreatmentsModule,
     PresentationsModule,
     PrioritiesModule,
     StatusModule,

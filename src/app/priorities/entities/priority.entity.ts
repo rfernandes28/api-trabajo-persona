@@ -14,6 +14,12 @@ export class Priority {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ type: 'int', nullable: true })
+  level: number;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  color: string;
+
   @CreateDateColumn({
     name: 'create_at',
     type: 'timestamptz',

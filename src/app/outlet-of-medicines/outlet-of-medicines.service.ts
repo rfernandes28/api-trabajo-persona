@@ -7,24 +7,38 @@ import { UpdateOutletOfMedicineDto } from './dto/update-outlet-of-medicine.dto';
 import { OutletOfMedicine } from './entities/outlet-of-medicine.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { MedicinesService } from '../medicines/medicines.service';
+import { CommercialPresentationsService } from '../commercial-presentations/commercial-presentations.service';
+import { PatientsService } from '../patients/patients.service';
 
 @Injectable()
 export class OutletOfMedicinesService {
   constructor(
     @InjectRepository(OutletOfMedicine)
     private outletOfMedicineRepo: Repository<OutletOfMedicine>,
-    private medicinesService: MedicinesService,
+    private patientsService: PatientsService,
+    private commercialPresentationsService: CommercialPresentationsService,
   ) {}
 
   async create(createOutletOfMedicineDto: CreateOutletOfMedicineDto) {
-    const { medicineId, unitQuantity } = createOutletOfMedicineDto;
+    const { commercialPresentationId, unitQuantity, patientId, createAt } =
+      createOutletOfMedicineDto;
 
-    const medicine = await this.medicinesService.findOne(medicineId);
+    const commercialPresentation =
+      await this.commercialPresentationsService.findOne(
+        commercialPresentationId,
+      );
+
+    const patient = await this.patientsService.findOne(patientId);
+
     const newOutletOfMedicine = new OutletOfMedicine();
 
-    newOutletOfMedicine.medicine = medicine;
+    if (createAt) {
+      newOutletOfMedicine.createAt = new Date(createAt);
+    }
+
+    newOutletOfMedicine.commercialPresentation = commercialPresentation;
     newOutletOfMedicine.unitQuantity = unitQuantity;
+    newOutletOfMedicine.patient = patient;
 
     return this.outletOfMedicineRepo.save(newOutletOfMedicine);
   }
@@ -50,7 +64,11 @@ export class OutletOfMedicinesService {
   }
 
   async findOne(id: number) {
-    const outletOfMedicine = await this.outletOfMedicineRepo.findOneBy({ id });
+    const outletOfMedicine = await this.outletOfMedicineRepo.findOne({
+      where: { id },
+      relations: ['patient', 'commercialPresentation'],
+    });
+
     if (!outletOfMedicine) {
       throw new NotFoundException(`OutletOfMedicine #${id} not found`);
     }

@@ -12,6 +12,11 @@ export enum Action {
   CARGAR = 'CARGAR',
   REGISTRAR = 'REGISTRAR',
   ENTRADAS = 'ENTRADAS',
+}
+
+export enum ActionOut {
+  CARGAR = 'CARGAR',
+  REGISTRAR = 'REGISTRAR',
   SALIDAS = 'SALIDAS',
 }
 
@@ -52,7 +57,24 @@ export class loadMedicineDto {
   @ApiProperty({
     default: Action.CARGAR,
     description:
-      'CARGAR: accion para cargar Medicinas, Principios Activos, Paquetes y Presentacion  \n  REGISTRAR: accion para hacer las relaciones de las entidades anteriores  \n  ENTRADAS: accion para registrar entradas de medicinas  \n  SALIDAS: accion para registrar salidas de medicinas ',
+      'CARGAR: accion para cargar Medicinas, Principios Activos, Paquetes y Presentacion  \n  REGISTRAR: accion para hacer las relaciones de las entidades anteriores  \n  ENTRADAS: accion para registrar entradas de medicinas  ',
   })
   readonly action: Action;
+}
+
+export class loadMedicineFromTreatmentDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    description: 'Seleccionar la hoja a cargar',
+  })
+  readonly sheet: SheetPatient;
+
+  @IsString()
+  @ApiProperty({
+    default: ActionOut.CARGAR,
+    description:
+      'CARGAR: accion para cargar Medicinas, Principios Activos, Presentacion  \n  REGISTRAR: accion para hacer las relaciones de las entidades anteriores',
+  })
+  readonly action: ActionOut;
 }

@@ -6,8 +6,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'pathologies' })
-export class Pathology {
+@Entity({ name: 'treatments' })
+export class Treatment {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
@@ -14,6 +15,16 @@ export class CreatePriorityDto {
   @IsString()
   @ApiProperty()
   readonly name: string;
+
+  @IsOptional()
+  @IsNumber()
+  @ApiProperty()
+  readonly level: number;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty()
+  readonly color: string;
 }
 
 export class FilterPriorityDto {

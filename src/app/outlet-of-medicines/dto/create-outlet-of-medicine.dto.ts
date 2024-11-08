@@ -18,7 +18,16 @@ export class CreateOutletOfMedicineDto {
   @IsNotEmpty()
   @IsPositive()
   @ApiProperty()
-  readonly medicineId: number;
+  readonly commercialPresentationId: number;
+
+  @IsNotEmpty()
+  @IsPositive()
+  @ApiProperty()
+  readonly patientId: number;
+
+  @IsOptional()
+  @ApiProperty()
+  readonly createAt: Date;
 }
 
 export class FilterOutletOfMedicineDto {

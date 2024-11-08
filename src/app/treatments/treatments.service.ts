@@ -3,28 +3,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, ILike, Repository } from 'typeorm';
 
 import {
-  CreatePathologyDto,
-  FilterPathologyDto,
+  CreateTreatmentDto,
+  FilterTreatmentDto,
 } from './dto/create-pathology.dto';
-import { UpdatePathologyDto } from './dto/update-pathology.dto';
-import { Pathology } from './entities/pathology.entity';
+import { UpdateTreatmentDto } from './dto/update-pathology.dto';
+import { Treatment } from './entities/treatment.entity';
 
 @Injectable()
-export class PathologiesService {
+export class TreatmentsService {
   constructor(
-    @InjectRepository(Pathology) private pathologyRepo: Repository<Pathology>,
+    @InjectRepository(Treatment) private pathologyRepo: Repository<Treatment>,
   ) {}
 
-  create(createPathologyDto: CreatePathologyDto) {
-    const newPathology = this.pathologyRepo.create(createPathologyDto);
+  create(createTreatmentDto: CreateTreatmentDto) {
+    const newTreatment = this.pathologyRepo.create(createTreatmentDto);
 
-    return this.pathologyRepo.save(newPathology);
+    return this.pathologyRepo.save(newTreatment);
   }
 
-  findAll(params?: FilterPathologyDto) {
+  findAll(params?: FilterTreatmentDto) {
     if (params) {
       const { limit, offset, order, sortBy, search } = params;
-      const where: FindOptionsWhere<Pathology> = {};
+      const where: FindOptionsWhere<Treatment> = {};
 
       if (search) {
         where.name = ILike(`%${search}%`);
@@ -43,15 +43,15 @@ export class PathologiesService {
   async findOne(id: number) {
     const pathology = await this.pathologyRepo.findOneBy({ id });
     if (!pathology) {
-      throw new NotFoundException(`Pathology #${id} not found`);
+      throw new NotFoundException(`Treatment #${id} not found`);
     }
     return pathology;
   }
 
-  async update(id: number, updatePathologyDto: UpdatePathologyDto) {
+  async update(id: number, updateTreatmentDto: UpdateTreatmentDto) {
     const pathology = await this.pathologyRepo.findOneBy({ id });
 
-    this.pathologyRepo.merge(pathology, updatePathologyDto);
+    this.pathologyRepo.merge(pathology, updateTreatmentDto);
 
     return this.pathologyRepo.save(pathology);
   }

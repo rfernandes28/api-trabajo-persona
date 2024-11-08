@@ -15,6 +15,7 @@ import {
   LoadCommunityDto,
   LoadPatientDto,
   loadMedicineDto,
+  loadMedicineFromTreatmentDto,
 } from './dto/load.dto';
 
 @ApiTags('master')
@@ -50,8 +51,7 @@ export class AppController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Carga de pacientes',
-    description:
-      'Este metodo se ejecutara con el excel "tratamientos" sobre la pestaña "CSS 0323" unicamente',
+    description: 'Este metodo se ejecutara con el excel "tratamientos"',
   })
   @ApiFile('file')
   @UseInterceptors(FileInterceptor('file'))
@@ -68,6 +68,31 @@ export class AppController {
     );
 
     this.appService.loadPatients(file, sheet);
+  }
+
+  @Post('load-medicines-treatments')
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary:
+      'Carga de principio activo, empaque y presentacion de los medicamentos',
+    description: 'Este metodo se ejecutara con el excel "tratamientos"',
+  })
+  @ApiFile('file')
+  @UseInterceptors(FileInterceptor('file'))
+  loadMedicinesFromTreatments(
+    @UploadedFile() file: Express.Multer.File,
+    @Query() loadDto: loadMedicineFromTreatmentDto,
+  ) {
+    if (!file)
+      throw new InternalServerErrorException('No se ha encontrado el archivo');
+    const { sheet, action } = loadDto;
+
+    Logger.log(
+      `loadMedicinesFromTreatments> fileName: ${file.originalname} sheet: ${sheet}, accion: ${action}`,
+      AppController.name,
+    );
+
+    this.appService.loadMedicinesFromTreatments(file, sheet, action);
   }
 
   @Post('load-medicines')

@@ -9,14 +9,14 @@ import {
 } from 'class-validator';
 import { order } from 'src/common/constants';
 
-export class CreatePathologyDto {
+export class CreateTreatmentDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
   readonly name: string;
 }
 
-export class FilterPathologyDto {
+export class FilterTreatmentDto {
   @IsPositive()
   @IsOptional()
   @ApiProperty()

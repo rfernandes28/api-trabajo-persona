@@ -15,7 +15,7 @@ import { MedicinesService } from '../app/medicines/medicines.service';
 import { CreateMedicineDto } from '../app/medicines/dto/create-medicine.dto';
 import { CreateMedicinesActivePrincipleDto } from '../app/medicines-active-principles/dto/create-medicines-active-principle.dto';
 import { MedicinesActivePrinciplesService } from '../app/medicines-active-principles/medicines-active-principles.service';
-import { Action } from './dto/load.dto';
+import { Action, ActionOut, SheetPatient } from './dto/load.dto';
 import { CommercialPresentationsService } from '../app/commercial-presentations/commercial-presentations.service';
 import { CreateCommercialPresentationDto } from '../app/commercial-presentations/dto/create-commercial-presentation.dto';
 import { EntranceOfMedicinesService } from '../app/entrance-of-medicines/entrance-of-medicines.service';
@@ -24,6 +24,8 @@ import { CreateUserDto } from '../app/users/dto/create-user.dto';
 import { UsersService } from '../app/users/users.service';
 import { CommunitiesService } from '../app/communities/communities.service';
 import { CreateCommunityDto } from 'src/app/communities/dto/create-community.dto';
+import { CreateOutletOfMedicineDto } from 'src/app/outlet-of-medicines/dto/create-outlet-of-medicine.dto';
+import { OutletOfMedicinesService } from 'src/app/outlet-of-medicines/outlet-of-medicines.service';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Excel = require('exceljs');
@@ -50,6 +52,7 @@ export class AppService {
     private communitiesService: CommunitiesService,
     private presentationsService: PresentationsService,
     private entranceOfMedicinesService: EntranceOfMedicinesService,
+    private outletOfMedicinesService: OutletOfMedicinesService,
     private medicinesActivePrinciplesService: MedicinesActivePrinciplesService,
   ) {}
 
@@ -82,7 +85,7 @@ export class AppService {
 
       const expirationColArray = worksheet.getColumn(10).values;
 
-      const expireyColArray = worksheet.getColumn(11).values;
+      const expireColArray = worksheet.getColumn(11).values;
 
       const donorColArray = worksheet.getColumn(13).values;
 
@@ -100,7 +103,7 @@ export class AppService {
 
       const newConcentration: any = [];
 
-      const newEntraceOfMedicines: any = [];
+      const newEntranceOfMedicines: any = [];
 
       activePrincipleColArray.map(
         async (activePrinciple: any, index: number) => {
@@ -114,7 +117,7 @@ export class AppService {
           let unitQuantity = unitQuantityColArray[index];
 
           const expiration = expirationColArray[index];
-          const expire = expireyColArray[index];
+          const expire = expireColArray[index];
           const donor = donorColArray[index];
 
           if (index !== 4) {
@@ -204,7 +207,7 @@ export class AppService {
                     .join(' ')
                 : 'S/I';
 
-              newEntraceOfMedicines.push({
+              newEntranceOfMedicines.push({
                 medicine: medicine.toUpperCase(),
                 concentration,
                 activePrinciple: activePrinciple
@@ -262,7 +265,7 @@ export class AppService {
         );
       } else if (action === Action.ENTRADAS) {
         Logger.verbose('Accion de registro de entradas de medicamentos');
-        await this.registerEntranceOfMedicines(newEntraceOfMedicines);
+        await this.registerEntranceOfMedicines(newEntranceOfMedicines);
       }
     } catch (error: any) {
       Logger.error(error, AppService.name);
@@ -298,6 +301,11 @@ export class AppService {
       const presentationFound = await this.presentationsService.findByName(
         presentation.name,
       );
+
+      console.log('medicineFound', medicineFound);
+      console.log('activePrincipleFound', activePrincipleFound);
+      console.log('packageFound', packageFound);
+      console.log('presentationFound', presentationFound);
 
       const data = {
         medicineId: medicineFound.id,
@@ -657,6 +665,7 @@ export class AppService {
 
       for (let index = 0; index < codeColArray.length; index++) {
         const code = codeColArray[index];
+
         let name = nameColArray[index];
         let note = '';
         const lastName = lastNameColArray[index];
@@ -716,6 +725,364 @@ export class AppService {
     }
   }
 
+  async loadMedicinesFromTreatments(
+    data: Express.Multer.File,
+    sheet: string,
+    action: ActionOut,
+  ) {
+    try {
+      const workbook = new Excel.Workbook();
+      await workbook.xlsx.load(data.buffer);
+
+      const worksheet = workbook.getWorksheet(sheet);
+
+      const codeColArray = worksheet.getColumn(2).values;
+      const medicineColArray = worksheet.getColumn(8).values;
+
+      const activePrincipleColArray = worksheet.getColumn(9).values;
+
+      let presentationColArray = worksheet.getColumn(10).values;
+
+      let concentrationColArray = worksheet.getColumn(11).values;
+
+      let ene22ColArray = worksheet.getColumn(15).values;
+      let feb22ColArray = worksheet.getColumn(16).values;
+      let mar22ColArray = worksheet.getColumn(17).values;
+      let abr22ColArray = worksheet.getColumn(18).values;
+      let may22ColArray = worksheet.getColumn(19).values;
+      let jun22ColArray = worksheet.getColumn(20).values;
+      let jul22ColArray = worksheet.getColumn(21).values;
+      let ago22ColArray = worksheet.getColumn(22).values;
+      let sep22ColArray = worksheet.getColumn(23).values;
+      let oct22ColArray = worksheet.getColumn(24).values;
+      let nov22ColArray = worksheet.getColumn(25).values;
+      let dic22ColArray = worksheet.getColumn(26).values;
+      let ene23ColArray = worksheet.getColumn(27).values;
+      let feb23ColArray = worksheet.getColumn(28).values;
+      let mar23ColArray = worksheet.getColumn(29).values;
+      let abr23ColArray = worksheet.getColumn(30).values;
+      let may23ColArray = worksheet.getColumn(31).values;
+      let jun23ColArray = worksheet.getColumn(32).values;
+      let jul23ColArray = worksheet.getColumn(33).values;
+      let ago23ColArray = worksheet.getColumn(34).values;
+      let sep23ColArray = worksheet.getColumn(35).values;
+      let otc23ColArray = worksheet.getColumn(35).values;
+      let nov23ColArray = worksheet.getColumn(37).values;
+
+      if (sheet === SheetPatient.CCS_0322) {
+        presentationColArray = worksheet.getColumn(11).values;
+        concentrationColArray = worksheet.getColumn(12).values;
+        ene22ColArray = worksheet.getColumn(14).values;
+        feb22ColArray = worksheet.getColumn(15).values;
+        mar22ColArray = worksheet.getColumn(16).values;
+        abr22ColArray = worksheet.getColumn(17).values;
+        may22ColArray = worksheet.getColumn(18).values;
+        jun22ColArray = worksheet.getColumn(19).values;
+        jul22ColArray = worksheet.getColumn(20).values;
+        ago22ColArray = worksheet.getColumn(21).values;
+        sep22ColArray = worksheet.getColumn(22).values;
+        oct22ColArray = worksheet.getColumn(23).values;
+        nov22ColArray = worksheet.getColumn(24).values;
+        dic22ColArray = worksheet.getColumn(25).values;
+        ene23ColArray = worksheet.getColumn(26).values;
+        feb23ColArray = worksheet.getColumn(27).values;
+        mar23ColArray = worksheet.getColumn(28).values;
+        abr23ColArray = worksheet.getColumn(29).values;
+        may23ColArray = worksheet.getColumn(30).values;
+        jun23ColArray = worksheet.getColumn(31).values;
+        jul23ColArray = worksheet.getColumn(32).values;
+        ago23ColArray = worksheet.getColumn(33).values;
+        sep23ColArray = worksheet.getColumn(34).values;
+        otc23ColArray = worksheet.getColumn(35).values;
+        nov23ColArray = worksheet.getColumn(36).values;
+      }
+
+      const newMedicine: any = [];
+
+      const newActivePrinciples: any = [];
+
+      const newPresentation: any = [];
+
+      const newPackage: any = [];
+
+      const newConcentration: any = [];
+
+      const newOutletOfMedicines: any = [];
+
+      for (let index = 0; index < medicineColArray.length; index++) {
+        let medicine = medicineColArray[index];
+        let activePrinciple = activePrincipleColArray[index];
+        let presentation = presentationColArray[index];
+        let concentration = concentrationColArray[index];
+        const codeCol = codeColArray[index];
+
+        let ene22Col = ene22ColArray[index];
+        let feb22Col = feb22ColArray[index];
+        let mar22Col = mar22ColArray[index];
+        let abr22Col = abr22ColArray[index];
+        let may22Col = may22ColArray[index];
+        let jun22Col = jun22ColArray[index];
+        let jul22Col = jul22ColArray[index];
+        let ago22Col = ago22ColArray[index];
+        let sep22Col = sep22ColArray[index];
+        let oct22Col = oct22ColArray[index];
+        let nov22Col = nov22ColArray[index];
+        let dic22Col = dic22ColArray[index];
+        let ene23Col = ene23ColArray[index];
+        let feb23Col = feb23ColArray[index];
+        let mar23Col = mar23ColArray[index];
+        let abr23Col = abr23ColArray[index];
+        let may23Col = may23ColArray[index];
+        let jun23Col = jun23ColArray[index];
+        let jul23Col = jul23ColArray[index];
+        let ago23Col = ago23ColArray[index];
+        let sep23Col = sep23ColArray[index];
+        let otc23Col = otc23ColArray[index];
+        let nov23Col = nov23ColArray[index];
+
+        // const feb22Col = feb22ColArray[index];
+
+        // console.log('feb22Col::', feb22Col, '>>', index);
+
+        if (index > 1) {
+          if (typeof medicine === 'object') {
+            const nameArray = medicine.richText;
+            medicine = nameArray[0].text;
+          }
+          medicine = medicine ? medicine.trim() : 's/i';
+
+          newMedicine.push({
+            name: medicine.toUpperCase(),
+            location: 'S/I',
+          });
+
+          newPackage.push({
+            name: 'S/I',
+          });
+
+          if (typeof activePrinciple === 'object') {
+            const nameArray = activePrinciple.richText;
+            activePrinciple = nameArray[0].text;
+          }
+
+          activePrinciple = activePrinciple ? activePrinciple.trim() : 's/i';
+
+          if (typeof presentation === 'object') {
+            const nameArray = presentation.richText;
+            presentation = nameArray[0].text;
+          }
+          presentation = presentation ? presentation.trim() : 's/i';
+          newPresentation.push({ name: presentation.toUpperCase() });
+
+          if (typeof concentration === 'object') {
+            const nameArray = concentration.richText;
+            concentration = nameArray[0].text;
+          }
+
+          if (typeof concentration === 'number') {
+            concentration = `${concentration} mg`;
+          }
+
+          concentration = concentration ? concentration.trim() : 's/i';
+          newConcentration.push({ name: concentration.toUpperCase() });
+
+          if (action === ActionOut.CARGAR) {
+            activePrinciple.split('/').map((value: string) => {
+              value = value.replace(/\s+/g, ' ');
+
+              newActivePrinciples.push({
+                name: value.trim().toUpperCase(),
+              });
+            });
+          } else if (action === ActionOut.REGISTRAR) {
+            activePrinciple = activePrinciple ? activePrinciple.trim() : 's/i';
+            newActivePrinciples.push({
+              name: activePrinciple.toUpperCase(),
+            });
+          } else if (action === ActionOut.SALIDAS) {
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            // ----
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+
+            if (typeof ene22Col === 'object') {
+              ene22Col = ene22Col.result;
+            }
+
+            if (ene22Col && codeCol) {
+              newOutletOfMedicines.push({
+                medicine: medicine.toUpperCase(),
+                concentration,
+                activePrinciple: activePrinciple
+                  ? activePrinciple.trim()
+                  : 'S/I',
+                unitQuantity: ene22Col,
+                presentation: presentation.toUpperCase(),
+                patient: codeCol,
+                date: ene22ColArray[1],
+              });
+            }
+          }
+        }
+      }
+
+      if (action === ActionOut.CARGAR) {
+        Logger.verbose('Accion de cargar');
+
+        const uniqueMedicineArray = this.removeDuplicates(newMedicine, 'name');
+
+        const uniqueActivePrinciplesArray = this.removeDuplicates(
+          newActivePrinciples,
+          'name',
+        );
+
+        const uniquePackageArray = this.removeDuplicates(newPackage, 'name');
+
+        const uniquePresentationArray = this.removeDuplicates(
+          newPresentation,
+          'name',
+        );
+
+        return Promise.all([
+          await this.registerMedicine(uniqueMedicineArray),
+          await this.registerActivePrinciple(uniqueActivePrinciplesArray),
+          await this.registerPresentation(uniquePresentationArray),
+          await this.registerPackage(uniquePackageArray),
+        ]);
+      } else if (action === ActionOut.REGISTRAR) {
+        Logger.verbose('Accion de registro');
+
+        await this.registerMedicineHasActivePrinciples(
+          newMedicine,
+          newActivePrinciples,
+          newPackage,
+          newPresentation,
+          newConcentration,
+        );
+      } else if (action === ActionOut.SALIDAS) {
+        Logger.verbose('Accion de registro de salidas de medicamentos');
+        await this.registerOutletOfMedicines(newOutletOfMedicines);
+      }
+    } catch (error: any) {
+      Logger.error(error, AppService.name);
+
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async registerOutletOfMedicines(medicines: any) {
+    try {
+      return Promise.all(
+        await medicines.map(async (data: any) => {
+          const {
+            medicine,
+            concentration,
+            unitQuantity,
+            presentation,
+            patient,
+            date,
+          } = data;
+
+          const medicineFound = await this.medicinesService.findByName(
+            medicine,
+          );
+
+          const commercialPresentation =
+            await this.commercialPresentationsService.findAll({
+              medicineId: medicineFound.id,
+            });
+
+          const commercialPresentationFound = commercialPresentation.filter(
+            (commercialPresentation: any) =>
+              commercialPresentation.name.includes(
+                concentration.toUpperCase(),
+              ) && commercialPresentation.presentation.name === presentation,
+          )[0];
+
+          const patientFound = await this.patientsService.findByCode(patient);
+          if (commercialPresentationFound && patientFound) {
+            const dataOutletOfMedicines: CreateOutletOfMedicineDto = {
+              commercialPresentationId: commercialPresentationFound.id,
+              unitQuantity,
+              patientId: patientFound.id,
+              createAt: date,
+            };
+            return await this.outletOfMedicinesService.create(
+              dataOutletOfMedicines,
+            );
+          }
+        }),
+      );
+    } catch (error) {
+      console.log('error>>', error);
+
+      return error;
+    }
+  }
+
   async registerCommunity(communities: any) {
     Promise.all(
       communities.map(async (community: { name: string }) => {
@@ -745,8 +1112,6 @@ export class AppService {
           communityId: number;
           contactPerson: string;
         }) => {
-          console.log('patient', patient);
-
           const {
             code,
             name,

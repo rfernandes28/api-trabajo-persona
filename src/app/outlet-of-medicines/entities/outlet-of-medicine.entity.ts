@@ -1,5 +1,5 @@
+import { Patient } from '../../patients/entities/patient.entity';
 import { CommercialPresentation } from '../../commercial-presentations/entities/commercial-presentation.entity';
-import { Medicine } from '../../medicines/entities/medicine.entity';
 import {
   Column,
   CreateDateColumn,
@@ -18,19 +18,19 @@ export class OutletOfMedicine {
   @Column({ type: 'int' })
   unitQuantity: number;
 
-  @ManyToOne(() => Medicine)
-  @JoinColumn({
-    name: 'medicine_id',
-    referencedColumnName: 'id',
-  })
-  medicine: Medicine;
-
   @ManyToOne(() => CommercialPresentation)
   @JoinColumn({
     name: 'commercial_presentation_id',
     referencedColumnName: 'id',
   })
   commercialPresentation: CommercialPresentation;
+
+  @ManyToOne(() => Patient)
+  @JoinColumn({
+    name: 'patient_id',
+    referencedColumnName: 'id',
+  })
+  patient: Patient;
 
   @CreateDateColumn({
     name: 'create_at',
